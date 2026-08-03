@@ -111,7 +111,8 @@ TH1* GHistogramer::Create(TDirectory* dir, const std::string& name,
 
 void GHistogramer::Fill(const std::string& pathName,        
                         int xbins,double xlow,double xhigh,double xvalue,       
-                        int ybins,double ylow,double yhigh,double yvalue) {
+                        int ybins,double ylow,double yhigh,double yvalue,
+                        double weight) {
   auto store = GetThreadHistogramStore();
   auto it = store->histograms.find(pathName);
 
@@ -139,9 +140,9 @@ void GHistogramer::Fill(const std::string& pathName,
 
   TH1* hist = it->second.get();
   if(ybins>0) 
-    hist->Fill(xvalue,yvalue);
+    static_cast<TH2*>(hist)->Fill(xvalue,yvalue,weight);
   else 
-    hist->Fill(xvalue);
+    hist->Fill(xvalue,weight);
 }
 
 std::shared_ptr<GHistogramer::ThreadHistogramStore>

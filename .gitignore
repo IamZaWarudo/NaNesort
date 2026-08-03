@@ -1,0 +1,15 @@
+
+
+*.root
+*.tof
+evtfile
+corl
+tofcorr
+tof
+tree
+
+\\
+
+bin
+build
+

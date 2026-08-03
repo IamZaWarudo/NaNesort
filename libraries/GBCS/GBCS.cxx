@@ -109,6 +109,7 @@ void GBCS::Unpack(const std::vector<ddasHit>& event) {
 
   fPixel.BuildImplantPixel(fImplant);   
   fPixel.BuildDecayPixel(fDecay);       
+  fCrystal.BuildAddback();
 }
 
 

@@ -1,134 +1,127 @@
 #include <ddasHit.h>
 #include <GPixel.h>
+#include <GBCS.h>
+#include <cmath>
 
-GPixel::GPixel() { Reset(); }
+GPixel::GPixel() { Reset();}
 GPixel::~GPixel() {}
 
-
 void GPixel::Reset() {
-  ImplantPixel = {-1.0, -1.0};
-  DecayPixel   = {-1.0, -1.0};
+  ImPixel = {-1.0, -1.0};
+  DePixel = {-1.0, -1.0};
 
-  ImplantFrontStrip = -1;  
-  ImplantBackStrip  = -1;
-  DecayFrontStrip   = -1;  
-  DecayBackStrip    = -1;
+  ImTime = -1.0;
+  ImEnergy = 0.0;
+  ImfMaxStrip = -1;
+  ImbMaxStrip = -1;
+  ImfMult = 0;
+  ImbMult = 0;
 
-  ImplantTime   = -1.0;  
-  DecayTime     = -1.0;
-  ImplantEnergy =  0.0;  
-  DecayEnergy   =  0.0;
+  DeTime = -1.0;
+  DeEnergy = 0.0;
+  DefMaxStrip = -1;
+  DebMaxStrip = -1;
+  DefMult = 0;
+  DebMult = 0;
 
-  ImplantFrontE = 0.0;  
-  ImplantBackE  = 0.0;
-  DecayFrontE   = 0.0;  
-  DecayBackE    = 0.0;
-
-  ImplantFrontMult = 0;  
-  ImplantBackMult  = 0;
-  DecayFrontMult   = 0;  
-  DecayBackMult    = 0;
 }
 
-
-// Implant - front low 40...79 & back low 120...159
 void GPixel::BuildImplantPixel(const std::vector<ddasHit>& hits) {
-  double frontSumE = 0.0, frontSumEStrip = 0.0;
-  double backSumE  = 0.0, backSumEStrip  = 0.0;
+  double feSum = 0;
+  double feSumStrip = 0;
+  double beSum = 0;
+  double beSumStrip = 0;
+  double fMaxE = -1.0;
+  double bMaxE = -1.0;
+  double fMaxTime = -1.0;
+  double bMaxTime = -1.0;
+  int fMult = 0;
+  int bMult = 0;
+  int fMaxStrip = -1;
+  int bMaxStrip = -1;
 
-  double frontMaxE = -1, frontMaxT = -1;
-  double backMaxE  = -1, backMaxT  = -1;
-  int    frontMaxStrip = -1, backMaxStrip = -1;
-  int    frontMult = 0, backMult = 0;
 
-  for(const auto& hit : hits) {
-    const int    id     = hit.GetId();
-    const double energy = hit.GetEcal();
-    if(energy <= 0.0) continue;
+  for(const auto& hit : hits){
+    const int id = hit.GetId();
+    const double e = hit.GetEcal();
 
-    if(id >= 40 && id <= 79) {                 // front low gain
+    if(id >= 40 && id <= 79){
       const int strip = id - 40;
-      frontSumE      += energy;
-      frontSumEStrip += energy * strip;
-      ++frontMult;
-      if(energy > frontMaxE) {
-        frontMaxE = energy; frontMaxT = hit.GetTime(); frontMaxStrip = strip;
-      }
-    }
-    else if(id >= 120 && id <= 159) {          // back low gain
+      feSum += e;
+      feSumStrip += e * strip;
+      ++fMult;
+      if(e > fMaxE) {fMaxE = e; fMaxTime = hit.GetTime(); fMaxStrip = strip;}
+    } else 
+    if(id >= 120 && id <= 159) {
       const int strip = id - 120;
-      backSumE      += energy;
-      backSumEStrip += energy * strip;
-      ++backMult;
-      if(energy > backMaxE) {
-        backMaxE = energy; backMaxT = hit.GetTime(); backMaxStrip = strip;
-      }
-    }
+      beSum += e;
+      beSumStrip += e * strip;
+      ++bMult;
+       if(e > bMaxE) {bMaxE = e; bMaxTime = hit.GetTime(); bMaxStrip = strip;}     
+       }
   }
 
-  const double dt = frontMaxT - backMaxT;
-  if(dt < 2 || dt > 7) return;                 // LG: 2-7 ticks
+  const double dt = fMaxTime - bMaxTime;
+  if(dt < 2 || dt > 7) return;
 
-  ImplantPixel[0] = frontSumE > 0.0 ? frontSumEStrip / frontSumE : -1.0;
-  ImplantPixel[1] = backSumE  > 0.0 ? backSumEStrip  / backSumE  : -1.0;
+  ImPixel[0] = feSum > 0.0 ? feSumStrip/feSum : -1;
+  ImPixel[1] = beSum > 0.0 ? beSumStrip/beSum : -1;
 
-  ImplantTime       = frontMaxT;
-  ImplantEnergy     = 0.5 * (frontSumE + backSumE);
-  ImplantFrontStrip = frontMaxStrip;
-  ImplantBackStrip  = backMaxStrip;
-  ImplantFrontE     = frontSumE;
-  ImplantBackE      = backSumE;
-  ImplantFrontMult  = frontMult;
-  ImplantBackMult   = backMult;
+  ImTime = fMaxTime;
+  ImEnergy = 0.5 * (feSum + beSum);
+  ImfMaxStrip = fMaxStrip;
+  ImbMaxStrip = bMaxStrip;
+  ImfMult = fMult;
+  ImbMult = bMult;
 }
 
-// Decay - front high 0...39 & back high 80...119
+
 void GPixel::BuildDecayPixel(const std::vector<ddasHit>& hits) {
-  double frontSumE = 0.0, frontSumEStrip = 0.0;
-  double backSumE  = 0.0, backSumEStrip  = 0.0;
+  double feSum = 0;
+  double feSumStrip = 0;
+  double beSum = 0;
+  double beSumStrip = 0;
+  double fMaxE = -1.0;
+  double bMaxE = -1.0;
+  double fMaxTime = -1.0;
+  double bMaxTime = -1.0;
+  int fMult = 0;
+  int bMult = 0;
+  int fMaxStrip = -1;
+  int bMaxStrip = -1;
 
-  double frontMaxE = -1, frontMaxT = -1;
-  double backMaxE  = -1, backMaxT  = -1;
-  int    frontMaxStrip = -1, backMaxStrip = -1;
-  int    frontMult = 0, backMult = 0;
+  for(const auto& hit : hits){
+    const int id = hit.GetId();
+    const double e = hit.GetEcal();
 
-  for(const auto& hit : hits) {
-    const int    id     = hit.GetId();
-    const double energy = hit.GetEcal();
-    if(energy <= 0.0) continue;
-
-    if(id >= 0 && id <= 39) {                  // front high gain
+    if(id >= 0 && id <= 39){
       const int strip = id;
-      frontSumE      += energy;
-      frontSumEStrip += energy * strip;
-      ++frontMult;
-      if(energy > frontMaxE) {
-        frontMaxE = energy; frontMaxT = hit.GetTime(); frontMaxStrip = strip;
-      }
-    }
-    else if(id >= 80 && id <= 119) {           // back high gain
+      feSum += e;
+      feSumStrip += e * strip;
+      ++fMult;
+      if(e > fMaxE) {fMaxE = e; fMaxTime = hit.GetTime(); fMaxStrip = strip;}
+    }else 
+    if(id >= 80 && id <= 119) {
       const int strip = id - 80;
-      backSumE      += energy;
-      backSumEStrip += energy * strip;
-      ++backMult;
-      if(energy > backMaxE) {
-        backMaxE = energy; backMaxT = hit.GetTime(); backMaxStrip = strip;
-      }
-    }
-  }
+      beSum += e;
+      beSumStrip += e * strip;
+      ++bMult;
+       if(e > bMaxE) {bMaxE = e; bMaxTime = hit.GetTime(); bMaxStrip = strip;}     
+       }
 
-  const double dt = frontMaxT - backMaxT;
-  if(dt < 4 || dt > 13) return;                // HG: 4-13 ticks
+     }
 
-  DecayPixel[0] = frontSumE > 0.0 ? frontSumEStrip / frontSumE : -1.0;
-  DecayPixel[1] = backSumE  > 0.0 ? backSumEStrip  / backSumE  : -1.0;
+  const double dt = fMaxTime - bMaxTime;
+  if(dt < 4 || dt > 12) return;
 
-  DecayTime       = frontMaxT;
-  DecayEnergy     = 0.5 * (frontSumE + backSumE);
-  DecayFrontStrip = frontMaxStrip;
-  DecayBackStrip  = backMaxStrip;
-  DecayFrontE     = frontSumE;
-  DecayBackE      = backSumE;
-  DecayFrontMult  = frontMult;
-  DecayBackMult   = backMult;
+  DePixel[0] = feSum > 0.0 ? feSumStrip/feSum : -1;
+  DePixel[1] = beSum > 0.0 ? beSumStrip/beSum : -1;
+
+  DeTime = fMaxTime;
+  DeEnergy = 0.5 * (feSum + beSum);
+  DefMaxStrip = fMaxStrip;
+  DebMaxStrip = bMaxStrip;
+  DefMult = fMult;
+  DebMult = bMult;
 }
+

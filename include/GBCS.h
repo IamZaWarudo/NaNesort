@@ -24,6 +24,8 @@ class GBCS {
   std::vector<ddasHit> fImplant;
   std::vector<ddasHit> fDecay;
   std::vector<ddasHit> fVeto;
+  std::vector<ddasHit> fPDCheck; // Pin and DSSD gate check
+  std::vector<ddasHit> fPSCheck; // Pin and SSSD gate check
 
   GPixel fPixel;
 
@@ -32,7 +34,7 @@ class GBCS {
   GPIN fI2S;   
   GPIN fI2TAC; // I2S-I2N
   GPIN fPin1;
-//  GPIN fPin2;
+  GPIN fPin2;
 //  GPIN fPin3;
 
   GDSSD FrontLowGain;

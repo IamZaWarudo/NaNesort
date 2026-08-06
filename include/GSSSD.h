@@ -12,7 +12,7 @@ class GSSSD {
   void Get(int strip, const ddasHit& hit);
   void Reset();
 
-  private:
+//  private:
 
   double fCharge;
   double fEcal;

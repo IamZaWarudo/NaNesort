@@ -12,7 +12,7 @@ class GDSSD {
   void Reset();
 
 
-  private:
+//  private:
 
   double fCharge;
   double fEcal;

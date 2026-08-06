@@ -87,8 +87,8 @@ function(add_ijensort_executable target source)
 
     add_ijensort_executable(ijensort src/ijensort.cxx)
     add_ijensort_executable(correlate src/correlate.cxx)
-    add_ijensort_executable(PrintCheck src/PrintCheck.cxx)
-
+    #add_ijensort_executable(PrintCheck src/PrintCheck.cxx)
+    add_ijensort_executable(diagnosis src/diagnosis.cxx)
 
 
 

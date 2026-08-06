@@ -16,6 +16,7 @@ void GBCS::Reset() {
   fI2S.Reset();
   fI2TAC.Reset();
   fPin1.Reset();
+  fPin2.Reset();
 
   FrontLowGain.Reset();
   FrontHighGain.Reset();
@@ -35,11 +36,13 @@ void GBCS::Reset() {
 void GBCS::Unpack(const std::vector<ddasHit>& event) {
 
   bool Pin1Fired       = false;
+  bool Pin2Fired       = false;
   bool frontLowFired   = false;
   bool backLowFired    = false;
   bool frontHighFired  = false;
   bool backHighFired   = false;
-  bool VetoIon         = false;
+  bool SSSDLowFired    = false;
+  bool SSSDHighFired   = false;
 
   for(const auto &hit : event) {
   switch(hit.GetId()) {
@@ -61,6 +64,7 @@ void GBCS::Unpack(const std::vector<ddasHit>& event) {
         break;
       case 160 ... 175:  // SSSD High Gain strips
        fSSSDHigh.Get(hit.GetId() - 160, hit);
+       SSSDHighFired = true;
         break;
       case 176:
        fI2N.Get(hit);
@@ -76,8 +80,11 @@ void GBCS::Unpack(const std::vector<ddasHit>& event) {
        Pin1Fired = true;
         break;
       case 182:
+       fPin2.Get(hit);
+       Pin2Fired = true; 
         break;
       case 183:
+    // fPin3.Get(hit);    
         break;
       case 192 ... 207:
        fLaBr.Get(hit.GetId() - 192, hit);  // LaBr Crystals
@@ -87,25 +94,34 @@ void GBCS::Unpack(const std::vector<ddasHit>& event) {
         break;
       case 272 ... 287:  // SSSD Low Gain strips
        fSSSDLow.Get(hit.GetId() - 272, hit);
-       VetoIon = true;
+       SSSDLowFired = true;
         break;
 
       default:
       break;
     }
   }
- 
+
+
+
  fImplant.clear();
-  if (frontLowFired && backLowFired && Pin1Fired && !VetoIon) {
+  if(Pin1Fired && Pin2Fired && frontLowFired && backLowFired && frontHighFired && backHighFired && !SSSDLowFired && !SSSDHighFired) {
     fImplant = event;}
 
   fDecay.clear();
-  if (frontHighFired && backHighFired && !Pin1Fired && !VetoIon) {
-    fDecay = event;}
+  if(!Pin1Fired && !Pin2Fired && !frontLowFired && !backLowFired && frontHighFired && backHighFired && !SSSDLowFired && !SSSDHighFired) {
+   fDecay = event;}
 
-  fVeto.clear();
-  if (VetoIon) {
-    fVeto = event;}
+  fPDCheck.clear();
+  if (frontLowFired && backLowFired && frontHighFired && backHighFired && Pin1Fired && Pin2Fired) {
+    fPDCheck = event;
+  }
+
+  fPSCheck.clear();
+   if (frontLowFired && backLowFired && frontHighFired && backHighFired && Pin1Fired && Pin2Fired && SSSDLowFired && SSSDHighFired) {
+     fPSCheck = event;
+   }
+  
 
   fPixel.BuildImplantPixel(fImplant);   
   fPixel.BuildDecayPixel(fDecay);       

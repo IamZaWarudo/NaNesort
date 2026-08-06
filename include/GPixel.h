@@ -15,31 +15,26 @@ class GPixel {
   void BuildImplantPixel (const std::vector<ddasHit>& hits);
   void BuildDecayPixel   (const std::vector<ddasHit>& hits);
 
-  bool ImplantValid() const { return ImplantPixel[0] >= 0.0 && ImplantPixel[1] >= 0.0; }
-  bool DecayValid()   const { return DecayPixel[0]   >= 0.0 && DecayPixel[1]   >= 0.0; }
+  bool Implant() const { return ImPixel[0] >= 0.0 && ImPixel[1] >= 0.0; }
+  bool Decay()   const { return DePixel[0] >= 0.0 && DePixel[1] >= 0.0; }
 
-  std::array<double,2> ImplantPixel {-1,-1};
-  std::array<double,2> DecayPixel   {-1,-1};
+  std::array<double,2> ImPixel = {-1.0, -1.0};
+  std::array<double,2> DePixel = {-1.0, -1.0};
 
-  int ImplantFrontStrip {-1};
-  int ImplantBackStrip  {-1};
-  int DecayFrontStrip   {-1};
-  int DecayBackStrip    {-1};
+  double ImTime = -1.0;
+  double ImEnergy = 0.0;
+  int ImfMaxStrip = -1;
+  int ImbMaxStrip = -1;
+  int ImfMult = 0;
+  int ImbMult = 0;
 
-  double ImplantTime   {-1};
-  double DecayTime     {-1};
-  double ImplantEnergy {0};
-  double DecayEnergy   {0};
+  double DeTime = -1.0;
+  double DeEnergy = 0.0;
+  int DefMaxStrip = -1;
+  int DebMaxStrip = -1;
+  int DefMult = 0;
+  int DebMult = 0;
 
-  double ImplantFrontE {0};
-  double ImplantBackE  {0};
-  double DecayFrontE   {0};
-  double DecayBackE    {0};
-
-  int ImplantFrontMult {0};
-  int ImplantBackMult  {0};
-  int DecayFrontMult   {0};
-  int DecayBackMult    {0};
 
  ClassDef(GPixel, 1);
 };

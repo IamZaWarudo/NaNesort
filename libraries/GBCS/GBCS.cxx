@@ -43,6 +43,8 @@ void GBCS::Unpack(const std::vector<ddasHit>& event) {
   bool backHighFired   = false;
   bool SSSDLowFired    = false;
   bool SSSDHighFired   = false;
+  bool I2SFired        = false;
+  bool I2NFired        = false;
 
   for(const auto &hit : event) {
   switch(hit.GetId()) {
@@ -67,10 +69,12 @@ void GBCS::Unpack(const std::vector<ddasHit>& event) {
        SSSDHighFired = true;
         break;
       case 176:
-       fI2N.Get(hit);
+       fI2N.Get(hit);    // Pin1 - I2N
+       I2NFired = true; 
         break;
       case 177:
-       fI2S.Get(hit); 
+       fI2S.Get(hit);    // Pin2 - I2S
+       I2SFired = true;
         break;
       case 180:
        fI2TAC.Get(hit);
@@ -86,14 +90,14 @@ void GBCS::Unpack(const std::vector<ddasHit>& event) {
       case 183:
     // fPin3.Get(hit);    
         break;
-      case 192 ... 207:
-       fLaBr.Get(hit.GetId() - 192, hit);  // LaBr Crystals
+      case 208 ... 223:
+       fLaBr.Get(hit.GetId() - 208, hit);  // LaBr Crystals
         break;
-      case 208 ... 271:  // 16 Clover x 4 crystals
-       fCrystal.Get(hit.GetId() - 208, hit);
+      case 224 ... 287:  // 16 Clover x 4 crystals
+       fCrystal.Get(hit.GetId() - 224, hit);
         break;
-      case 272 ... 287:  // SSSD Low Gain strips
-       fSSSDLow.Get(hit.GetId() - 272, hit);
+      case 192 ... 207:  // SSSD Low Gain strips
+       fSSSDLow.Get(hit.GetId() - 192, hit);
        SSSDLowFired = true;
         break;
 
@@ -105,11 +109,11 @@ void GBCS::Unpack(const std::vector<ddasHit>& event) {
 
 
  fImplant.clear();
-  if(Pin1Fired && Pin2Fired && frontLowFired && backLowFired && frontHighFired && backHighFired && !SSSDLowFired && !SSSDHighFired) {
+  if(I2SFired && I2NFired && Pin1Fired && Pin2Fired && frontLowFired && backLowFired && frontHighFired && backHighFired && !SSSDLowFired && !SSSDHighFired) {
     fImplant = event;}
 
   fDecay.clear();
-  if(!Pin1Fired && !Pin2Fired && !frontLowFired && !backLowFired && frontHighFired && backHighFired && !SSSDLowFired && !SSSDHighFired) {
+  if(I2SFired && I2NFired && !Pin1Fired && !Pin2Fired && !frontLowFired && !backLowFired && frontHighFired && backHighFired && !SSSDLowFired && !SSSDHighFired) {
    fDecay = event;}
 
   fPDCheck.clear();

@@ -8,6 +8,7 @@ void GPIN::Reset() {
   fCharge = 0;
   fEcal   = 0;
   fTime   = 0;
+  fTimestamp = 0;
 }
 
 void GPIN::Get(const ddasHit& hit){
@@ -15,4 +16,5 @@ void GPIN::Get(const ddasHit& hit){
   fTime   = hit.GetTime();
   fCharge = hit.GetCharge();
   fEcal   = hit.GetEcal();
+  fTimestamp = hit.GetTimestamp();
 }

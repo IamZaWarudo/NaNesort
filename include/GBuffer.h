@@ -121,7 +121,8 @@ class ddasBuffer {
     bool Push(ddasHit hit) {
       std::unique_lock<std::mutex> lock(fMutex);
       
-      const double t = hit.GetTime();
+      const double t = hit.GetTimestamp();
+
       
       if(fCurrentEvent.empty()) {
         fCurrentStart = t;

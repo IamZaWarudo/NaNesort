@@ -189,8 +189,14 @@ void ProcessEvent(GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrect
     if(bcs.fPin1.fTime > 0 && bcs.fPin2.fTime > 0){
     GHistogramer::Get().Fill("PIN/Pin1vs2", 4000,0,16000, bcs.fPin1.fEcal,
                                              4000,0,16000, bcs.fPin2.fEcal);}
-    }
- 
+  
+    // GHistogramer::Get().Fill("Punch_Thru/SSSDlow_vs_LGF",16,0,16, bcs.fSSSDLow.Strip,
+    //                                                       40,0,40, bcs.FrontLowGain.Strip);
+    // GHistogramer::Get().Fill("Punch_Thru/SSSDEcal_vs_LGFEcal",4000,0,30000, bcs.fSSSDLow.fEcal,
+    //                                                         4000,0,30000, bcs.FrontLowGain.fEcal);
+
+  }
+/* 
   for(const auto& hit : bcs.fImplant) {
     GHistogramer::Get().Fill("All_Channel/Implant_ecal", 10000, 0, 32000, hit.GetEcal(),
                                                    300,   0, 300,   hit.GetId());
@@ -199,6 +205,14 @@ void ProcessEvent(GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrect
  
     GHistogramer::Get().Fill("PIN/Pin1vs2_veto", 10000,0,16000, bcs.fPin1.fEcal,
                                              10000,0,16000, bcs.fPin2.fEcal);
+
+   // GHistogramer::Get().Fill("Punch_Thru/(Imp)SSSDlow_vs_LGF",16,0,16, bcs.fSSSDLow.Strip,
+   //                                                       40,0,40, bcs.FrontLowGain.Strip);
+
+   // GHistogramer::Get().Fill("Punch_Thru/(Imp)SSSDEcal_vs_LGFEcal",4000,0,30000, bcs.fSSSDLow.fEcal,
+   //                                                          4000,0,30000, bcs.FrontLowGain.fEcal);
+
+
   }
 
   for(const auto& hit : bcs.fDecay) {
@@ -297,6 +311,9 @@ void ProcessEvent(GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrect
     GHistogramer::Get().Fill("dssd/decay_map", 40, 0, 40, bcs.fPixel.DePixel[0],
                                                40, 0, 40, bcs.fPixel.DePixel[1]);
 }
+
+*/
+
 
 
 /*

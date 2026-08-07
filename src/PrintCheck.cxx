@@ -281,21 +281,21 @@ void ProcessEvent(GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrect
 
 
 //Position
-  if(bcs.fPixel.ImplantValid()) {
+  if(bcs.fPixel.Implant()) {
     GHistogramer::Get().Fill("dssd/implant_map", 40, 0, 40, bcs.fPixel.ImplantPixel[0],
                                                  40, 0, 40, bcs.fPixel.ImplantPixel[1]);
 
-    GHistogramer::Get().Fill("dssd/esum/implant_esum", 40, 0, 40, bcs.fPixel.ImplantPixel[0],
-                                                  40, 0, 40, bcs.fPixel.ImplantPixel[1],
-                                                  bcs.fPixel.ImplantEnergy);}
+//    GHistogramer::Get().Fill("dssd/esum/implant_esum", 40, 0, 40, bcs.fPixel.ImplantPixel[0],
+//                                                  40, 0, 40, bcs.fPixel.ImplantPixel[1],
+//                                                  bcs.fPixel.ImplantEnergy);}
 
-  if(bcs.fPixel.DecayValid()) {
+  if(bcs.fPixel.Decay()) {
     GHistogramer::Get().Fill("dssd/decay_map", 40, 0, 40, bcs.fPixel.DecayPixel[0],
                                                40, 0, 40, bcs.fPixel.DecayPixel[1]);
 
-    GHistogramer::Get().Fill("dssd/esum/decay_esum", 40, 0, 40, bcs.fPixel.DecayPixel[0],
-                                                  40, 0, 40, bcs.fPixel.DecayPixel[1],
-                                                  bcs.fPixel.DecayEnergy);}
+//    GHistogramer::Get().Fill("dssd/esum/decay_esum", 40, 0, 40, bcs.fPixel.DecayPixel[0],
+//                                                  40, 0, 40, bcs.fPixel.DecayPixel[1],
+//                                                  bcs.fPixel.DecayEnergy);}
 
 
 // Gamma Spectra

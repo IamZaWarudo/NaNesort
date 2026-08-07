@@ -14,10 +14,11 @@ class GSSSD {
 
 //  private:
 
+  int Strip;
   double fCharge;
   double fEcal;
   double fTime;
-
+  int fId;
 
   ClassDef(GSSSD,1);
 };

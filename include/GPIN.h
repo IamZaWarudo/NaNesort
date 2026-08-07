@@ -14,6 +14,7 @@ class GPIN {
   double fCharge;
   double fEcal;
   double fTime;
+  double fTimestamp;
 
   ClassDef(GPIN,1);
 };

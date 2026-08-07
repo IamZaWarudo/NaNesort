@@ -14,6 +14,7 @@ class GDSSD {
 
 //  private:
 
+  int Strip;
   double fCharge;
   double fEcal;
   double fTime;

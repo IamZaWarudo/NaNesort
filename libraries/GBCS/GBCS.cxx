@@ -89,16 +89,15 @@ void GBCS::Unpack(const std::vector<ddasHit>& event) {
         break;
       case 183:
     // fPin3.Get(hit);    
-        break;
+      case 192 ... 207:  // SSSD Low Gain strips
+       fSSSDLow.Get(hit.GetId() - 192, hit);
+       SSSDLowFired = true;
+       break;
       case 208 ... 223:
        fLaBr.Get(hit.GetId() - 208, hit);  // LaBr Crystals
         break;
       case 224 ... 287:  // 16 Clover x 4 crystals
        fCrystal.Get(hit.GetId() - 224, hit);
-        break;
-      case 192 ... 207:  // SSSD Low Gain strips
-       fSSSDLow.Get(hit.GetId() - 192, hit);
-       SSSDLowFired = true;
         break;
 
       default:

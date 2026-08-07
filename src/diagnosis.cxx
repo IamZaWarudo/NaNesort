@@ -196,7 +196,7 @@ void ProcessEvent(GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrect
     //                                                         4000,0,30000, bcs.FrontLowGain.fEcal);
 
   }
-/* 
+ 
   for(const auto& hit : bcs.fImplant) {
     GHistogramer::Get().Fill("All_Channel/Implant_ecal", 10000, 0, 32000, hit.GetEcal(),
                                                    300,   0, 300,   hit.GetId());
@@ -222,7 +222,7 @@ void ProcessEvent(GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrect
     GHistogramer::Get().Fill("dt/decayfhbhdt",  1000, 0,500, decayfhbhdt);
 
   }
-
+/*
   for(const auto& hit : bcs.fPDCheck) {
   double dtfl = bcs.FrontLowGain.fTime - bcs.fPin1.fTime;
   double dtbl = bcs.BackLowGain.fTime - bcs.fPin1.fTime;
@@ -256,7 +256,7 @@ void ProcessEvent(GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrect
     GHistogramer::Get().Fill("dt/Pin-sssdhigh",  1000, 0,500, dtsssdhigh);
     GHistogramer::Get().Fill("dt/dtsssdLowHigh",  1000, 0,500, dtsssdlowhigh);
   }
-
+*/
 // PID & TOF
   if(bcs.fPin1.fTime > 10 && bcs.fPin2.fTime > 10 && bcs.fI2S.fTime > 10) {
     const double runtime = bcs.fPin1.fTime / 1.e8;
@@ -311,9 +311,6 @@ void ProcessEvent(GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrect
     GHistogramer::Get().Fill("dssd/decay_map", 40, 0, 40, bcs.fPixel.DePixel[0],
                                                40, 0, 40, bcs.fPixel.DePixel[1]);
 }
-
-*/
-
 
 
 /*

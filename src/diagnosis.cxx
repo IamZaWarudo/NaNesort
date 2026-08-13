@@ -189,32 +189,48 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
   //FillHistograms(event);
   //FillHistograms(bcs);
 
-
-  // all channel
+  // per-hit fills
   for(const auto& hit : event) {
     GHistogramer::Get().Fill("All_Channel/ecal", 10000, 0, 32000, hit.GetEcal(),
         300,   0, 300,   hit.GetId());
     GHistogramer::Get().Fill("All_Channel/raw",  10000, 0, 32000, hit.GetCharge(),
-        300,   0, 300,   hit.GetId()); }
-    
-    if(Event.fPin1.HasHit() && Event.fPin2.HasHit()){
-      GHistogramer::Get().Fill("PID/pin1_PID",3600,0,32000, Event.fI2SPin1.fCharge,
-                                              3600,0,20000, Event.fPin1.fEcal);
-      GHistogramer::Get().Fill("PID/pin2_PID",3600,0,32000, Event.fPin2.fCharge);
-   }
+        300,   0, 300,   hit.GetId());
 
-
-    if(bcs.EventType() == 1) {
-      GHistogramer::Get().Fill("PID/Implant_PID",3600,0,64000, bcs.I2SPin1.fCharge,
-                                                3600,0,32000, bcs.Pin1.fEcal);}
-
-    if(bcs.EventType() == 2) {
-      GHistogramer::Get().Fill("PID/Decay_PID",3600,0,64000, bcs.I2SPin1.fCharge,
-                                               3600,0,32000, bcs.Pin1.fEcal);}
-    if(bcs.EventType() == 3) {
-      GHistogramer::Get().Fill("PID/LightIons_PID",3600,0,64000, bcs.I2SPin1.fCharge,
-                                                   3600,0,32000, bcs.Pin1.fEcal);}
-
-
+    if(bcs.EventType() == 5) {
+      GHistogramer::Get().Fill("All_Channel/5_ecal", 10000, 0, 32000, hit.GetEcal(),
+          300,   0, 300,   hit.GetId());
+    }
+    if(bcs.EventType() == 6) {
+      GHistogramer::Get().Fill("All_Channel/6_ecal", 10000, 0, 32000, hit.GetEcal(),
+          300,   0, 300,   hit.GetId());
+    }
+    if(bcs.EventType() == 7) {
+      GHistogramer::Get().Fill("All_Channel/7_ecal", 10000, 0, 32000, hit.GetEcal(),
+          300,   0, 300,   hit.GetId());
+    }
   }
+
+  // per-event fills (bcs/Event are filled once per event, not per hit)
+  if(bcs.EventType() == 5) {
+    GHistogramer::Get().Fill("PID/5_PID",3600,0,25000, bcs.I2SPin1.fCharge,
+                                          3600,0,15000, bcs.Pin1.fEcal);
+  }
+  if(bcs.EventType() == 6) {
+    GHistogramer::Get().Fill("PID/6_PID",3600,0,25000, bcs.I2SPin1.fCharge,
+                                          3600,0,15000, bcs.Pin1.fEcal);
+  }
+  if(bcs.EventType() == 7) {
+    GHistogramer::Get().Fill("PID/7_PID",3600,0,25000, bcs.I2SPin1.fCharge,
+                                          3600,0,15000, bcs.Pin1.fEcal);
+  }
+
+  if(Event.fPin1.HasHit() && Event.fPin2.HasHit()){
+    GHistogramer::Get().Fill("PID/pin1_PID",3600,0,25000, Event.fI2SPin1.fCharge,
+                                            3600,0,15000, Event.fPin1.fEcal);
+    GHistogramer::Get().Fill("PID/pin2_PID",3600,0,32000, Event.fPin2.fCharge);
+  }
+}
+    
+
+  
 

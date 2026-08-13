@@ -130,5 +130,21 @@ if(!IsImplant && !IsDecay && !IsLightIon) {
 }
 
 
+// PID Diagnostic 
+
+// Detectors : PIN1 PIN2 DSSDHigh SSSDLow SSSDHigh     (DSSDLow = unreliable)
+
+// noise 
+if(Pin1HasHit && Pin2HasHit && !DSSDHighHasGoodPosition && !SSSDLowHasHit && !SSSDHighHasHit) {
+  condition = 5;}
+
+// possible implants
+if(Pin1HasHit && Pin2HasHit && DSSDHighHasGoodPosition && !SSSDLowHasHit && !SSSDHighHasHit) {
+  condition = 6;}
+
+// possible light ions
+if(Pin1HasHit && Pin2HasHit && DSSDHighHasGoodPosition && !SSSDLowHasHit && SSSDHighHasHit) {
+  condition = 7;}
+
   return condition;
 }

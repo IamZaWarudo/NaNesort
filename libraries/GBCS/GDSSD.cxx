@@ -1,7 +1,7 @@
 #include <ddasHit.h>
 #include <GDSSD.h>
 #include <Unpacker.h>
-
+#include <cmath>
 
 GDSSD::GDSSD() { Reset();  }
 GDSSD::~GDSSD() {}
@@ -26,10 +26,14 @@ void GDSSD::Reset() {
   fyE        = 0; 
   fyMaxE     = 0; 
   fyMaxStrip = 0;
-
+  
+  fxMult     = 0;
+  fyMult     = 0;
 }
 
 void GDSSD::UnpackFront(const ddasHit& hit) {   
+ if (hit.GetEcal() >= 18000 ) return;
+
   fId = hit.GetId();
   frontTimestamp = hit.GetTimestamp();
   fEcal = hit.GetEcal();
@@ -42,6 +46,7 @@ void GDSSD::UnpackFront(const ddasHit& hit) {
 
   fxEsum += xpos * fEcal;
   fxE    += fEcal;
+  fxMult++;
 
   if(fEcal >= fxMaxE) {
     fxMaxE = fEcal;
@@ -50,6 +55,8 @@ void GDSSD::UnpackFront(const ddasHit& hit) {
 }
 
 void GDSSD::UnpackBack(const ddasHit& hit) {   
+ if (hit.GetEcal() >= 18000 ) return;
+
   fId = hit.GetId();
   backTimestamp = hit.GetTimestamp();
   fEcal = hit.GetEcal();
@@ -62,6 +69,7 @@ void GDSSD::UnpackBack(const ddasHit& hit) {
   
   fyEsum += ypos * fEcal;
   fyE    += fEcal;
+  fyMult++;
 
   if(fEcal >= fyMaxE) {
     fyMaxE = fEcal;
@@ -78,19 +86,22 @@ bool GDSSD::HasGoodPosition() {
     return false;
   }
 
+ // if (std::abs(fxMult - fyMult) > 2) {
+ //   GoodX = false;
+ //   GoodY = false;
+ //   return false;
+ // }
+
+
   if (fxE > 0){
     Xpos = fxEsum / fxE;
-    GoodX = fabs(Xpos - fxMaxStrip) <= 2;
+    GoodX = fabs(Xpos - fxMaxStrip) <= 3;
   }
   if (fyE > 0){
     Ypos = fyEsum / fyE;
-    GoodY = fabs(Ypos - fyMaxStrip) <= 2;
+    GoodY = fabs(Ypos - fyMaxStrip) <= 3;
   }
 
-//printf("[GDSSD::Finalize] Xpos=%d (sum=%.2f, weight=%.2f, maxStrip=%.2f) fGoodX=%d | "
-//       "Ypos=%d (sum=%.2f, weight=%.2f, maxStrip=%.2f) fGoodY=%d\n",
-//       Xpos, fxEsum, fxE, fxMaxStrip, GoodX,
-//       Ypos, fyEsum, fyE, fyMaxStrip, GoodY);
 
 return GoodX && GoodY;
 }

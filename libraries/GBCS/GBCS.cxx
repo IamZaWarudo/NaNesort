@@ -43,31 +43,15 @@ void GBCS::Fill(const Unpacker& Event) {
 }
 
 
-/****************************************
- * Correlation flags:                   *
- * ==================================== *
- * 4  - implant good position    -------------*
- * 8  - implant bad position            *
- * 12 - decay good position      -------------*
- * 16 - decay bad position              *
- * 20 - light ion good position  -------------*
- * 24 - light ion bad position
- * 28 - decay before ion (BAD!)         *
- * 32 - good correlation                *
- * 44 - no implants to correlate        *
- * 56 - Clover only     *
- * 96 - unknown event                   *
- * ==================================== *
- * 99 - Reset correlation aray          *
- ****************************************/
-
-
-/*
-Implant - 1
-decay   - 2
-LightIon - 3
-Undentified - 4
-*/
+/****************
+Implant -----> 1
+*****************
+decay -------> 2
+*****************
+LightIon ----> 3
+*****************
+Undentified -> 4
+*****************/
 
 int GBCS::EventType(){
 
@@ -80,18 +64,10 @@ int GBCS::EventType(){
  bool Pin1HasHit = false;
  bool Pin2HasHit = false;
 
- bool HasPinImplant = false;
- bool HasPinLightIon = false;
-
- bool Pin1HasImplant = false;
- bool Pin1HasLightIon = false;
- bool Pin2HasImplant = false;
- bool Pin2HasLightIon = false;
-
  bool SSSDLowHasHit = false;
  bool SSSDHighHasHit = false;
 
- bool HasTOF = false;
+ bool HasToF = false;
 
  bool HasClover = false;
  bool HasLaBr = false;
@@ -122,6 +98,9 @@ int GBCS::EventType(){
     Pin2HasHit = true;
   }
 
+  if(I2SPin1.HasHit() && Pin1.HasHit()){
+    HasToF = true;
+  }
 
   if(SSSDLow.HasHit()){
     SSSDLowHasHit = true;
@@ -132,7 +111,7 @@ int GBCS::EventType(){
   }
 
 
-if(Pin1HasHit && Pin2HasHit && DSSDLowHasGoodPosition && !SSSDLowHasHit && !SSSDHighHasHit){
+if(HasToF && Pin1HasHit && Pin2HasHit && DSSDLowHasGoodPosition && !SSSDLowHasHit && !SSSDHighHasHit){
  IsImplant = true;
  condition = 1;
 } else

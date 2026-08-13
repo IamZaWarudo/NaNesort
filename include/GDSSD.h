@@ -37,6 +37,8 @@ class GDSSD {
   double  fyMaxE;     
   double  fyMaxStrip; 
 
+  int     fxMult;
+  int     fyMult;
 
  ClassDef(GDSSD,1);
 };

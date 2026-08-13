@@ -46,25 +46,25 @@ static std::string FormatDuration(double seconds) {
 int main(int argc, char** argv) {
   if(argc < 2) { printf("usage: PrintCheck file.evt [file.evt ...]\n"); return 1; }
 
-   std::vector<std::string> inputFiles;
-   std::string correctionFile;
+  std::vector<std::string> inputFiles;
+  std::string correctionFile;
 
-   for(int i = 1; i < argc; ++i) {
-     std::filesystem::path argument(argv[i]);
-     const std::string extension = argument.extension().string();
+  for(int i = 1; i < argc; ++i) {
+    std::filesystem::path argument(argv[i]);
+    const std::string extension = argument.extension().string();
 
-     if(extension == ".evt") {
-       inputFiles.push_back(argument.string());
-     } else if(extension == ".tof") {
-       if(!correctionFile.empty()) {
-         printf("Only one .tof file may be supplied\n");
-         return 1;
-       }
-       correctionFile = argument.string();
-     } else {
-       printf("Unsupported input file: %s\n", argv[i]);
-       return 1;
-     }
+    if(extension == ".evt") {
+      inputFiles.push_back(argument.string());
+    } else if(extension == ".tof") {
+      if(!correctionFile.empty()) {
+        printf("Only one .tof file may be supplied\n");
+        return 1;
+      }
+      correctionFile = argument.string();
+    } else {
+      printf("Unsupported input file: %s\n", argv[i]);
+      return 1;
+    }
   }
 
   if(inputFiles.empty()) { printf("No EVT files supplied\n"); return 1; }
@@ -92,10 +92,10 @@ int main(int argc, char** argv) {
   GHistogramer::Get().SetOutFile(ofile);
 
   std::unique_ptr<TOFCorrector> tofCorrector;
-    if(!correctionFile.empty()) {
-      printf("Loading TOF correction: %s\n", correctionFile.c_str());
-      tofCorrector = std::make_unique<TOFCorrector>(correctionFile);
-    }
+  if(!correctionFile.empty()) {
+    printf("Loading TOF correction: %s\n", correctionFile.c_str());
+    tofCorrector = std::make_unique<TOFCorrector>(correctionFile);
+  }
 
   evtLoop  reader(inputFiles, 500000, true);
   ddasLoop converter(reader, 200, 1);
@@ -151,8 +151,8 @@ int main(int argc, char** argv) {
       if(etaSec < 0 && e.filePos > 0 && elapsed > 0)
         etaSec = remainMB / ((e.filePos / 1024.0 / 1024.0) / elapsed);
       std::string etaStr = (e.filePos >= e.fileSize)
-                             ? std::string("draining")
-                             : FormatDuration(etaSec);
+        ? std::string("draining")
+        : FormatDuration(etaSec);
 
       printf(CLEAR_LINE "[%s] %6.2f%%  file %llu/%llu  %.1f/%.1f MB  %7.1f MB/s\n",
           bar.c_str(), percent,
@@ -186,144 +186,190 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
   bcs.Reset();
   bcs.Fill(Event);
 
-// all channel
+  //FillHistograms(event);
+  //FillHistograms(bcs);
+
+
+  // all channel
   for(const auto& hit : event) {
     GHistogramer::Get().Fill("All_Channel/ecal", 10000, 0, 32000, hit.GetEcal(),
-                                                   300,   0, 300,   hit.GetId());
+        300,   0, 300,   hit.GetId());
     GHistogramer::Get().Fill("All_Channel/raw",  10000, 0, 32000, hit.GetCharge(),
-                                                   300,   0, 300,   hit.GetId()); }
-  if(Event.fDSSDHigh.HasGoodPosition()){
-    double dt = Event.fDSSDHigh.frontTimestamp - Event.fDSSDHigh.backTimestamp; 
+        300,   0, 300,   hit.GetId()); }
+    if(Event.fDSSDHigh.HasGoodPosition()){
+      double dt = Event.fDSSDHigh.frontTimestamp - Event.fDSSDHigh.backTimestamp; 
 
-    GHistogramer::Get().Fill("position/DSSD_High", 40,0,40, Event.fDSSDHigh.Xpos,
-                                                   40,0,40, Event.fDSSDHigh.Ypos);
+      GHistogramer::Get().Fill("position/DSSD_High", 40,0,40, Event.fDSSDHigh.Xpos,
+          40,0,40, Event.fDSSDHigh.Ypos);
 
-    GHistogramer::Get().Fill("dt_front-back_High", 1000,0,1000,dt);}
+      GHistogramer::Get().Fill("dt_front-back_High", 1000,0,1000,dt);}
 
-  if(Event.fDSSDLow.HasGoodPosition()){
-    double dt = Event.fDSSDLow.frontTimestamp - Event.fDSSDLow.backTimestamp; 
+    if(Event.fDSSDLow.HasGoodPosition()){
+      double dt = Event.fDSSDLow.frontTimestamp - Event.fDSSDLow.backTimestamp; 
 
-    GHistogramer::Get().Fill("position/DSSD_Low", 40,0,40, Event.fDSSDLow.Xpos,
-                                                 40,0,40, Event.fDSSDLow.Ypos);
+      GHistogramer::Get().Fill("position/DSSD_Low", 40,0,40, Event.fDSSDLow.Xpos,
+          40,0,40, Event.fDSSDLow.Ypos);
 
-    GHistogramer::Get().Fill("dt_front-back_Low", 1000,0,1000,dt);}
-  
-  if(Event.fPin1.HasHit() && Event.fPin2.HasHit()){
-    GHistogramer::Get().Fill("PID/pin1_PID",3600,0,64000, Event.fI2SPin1.fCharge,
-                                            3600,0,32000, Event.fPin1.fEcal);
-    GHistogramer::Get().Fill("PID/pin2_PID",3600,0,32000, Event.fPin2.fCharge);
-    GHistogramer::Get().Fill("PID/I2TAC", 3600,0,32000, Event.fI2TAC.fEcal);}
+      GHistogramer::Get().Fill("dt_front-back_Low", 1000,0,1000,dt);}
 
-  if(Event.fPin1.Timestamp > 10 && Event.fI2SPin1.Timestamp > 10){
-  const double runtime = Event.fPin1.Timestamp / 1.e8;
-  const double rawTOF  = Event.fI2SPin1.fCharge;
+    if(Event.fPin1.HasHit() && Event.fPin2.HasHit()){
+      GHistogramer::Get().Fill("PID/pin1_PID",3600,0,64000, Event.fI2SPin1.fCharge,
+          3600,0,32000, Event.fPin1.fEcal);
+      GHistogramer::Get().Fill("PID/pin2_PID",3600,0,32000, Event.fPin2.fCharge);
+      GHistogramer::Get().Fill("PID/I2TAC", 3600,0,32000, Event.fI2TAC.fEcal);}
 
-    GHistogramer::Get().Fill("TOF/tof_raw", 3600, 0, 7200,  runtime,
-                                            4000, 0, 64000, rawTOF);
-  }
+    if(Event.fPin1.Timestamp > 10 && Event.fI2SPin1.Timestamp > 10){
+      const double runtime = Event.fPin1.Timestamp / 1.e8;
+      const double rawTOF  = Event.fI2SPin1.fCharge;
 
-/*  if(bcs.EventType() == 1) {
-    GHistogramer::Get().Fill("PID/Implant_PID",3600,0,64000, Event.fI2SPin1.fCharge,
-                                            3600,0,32000, Event.fPin1.fEcal);}
+      GHistogramer::Get().Fill("TOF/tof_raw", 3600, 0, 7200,  runtime,
+          4000, 0, 64000, rawTOF);
+    }
 
-  if(bcs.EventType() == 2) {
-    GHistogramer::Get().Fill("PID/Decay_PID",3600,0,64000, Event.fI2SPin1.fCharge,
-                                            3600,0,32000, Event.fPin1.fEcal);}
-  if(bcs.EventType() == 3) {
-    GHistogramer::Get().Fill("PID/LightIons_PID",3600,0,64000, Event.fI2SPin1.fCharge,
-                                            3600,0,32000, Event.fPin1.fEcal);}
+    if(bcs.EventType() == 1) {
+      GHistogramer::Get().Fill("PID/Implant_PID",3600,0,64000, bcs.I2SPin1.fCharge,
+          3600,0,32000, bcs.Pin1.fEcal);}
+
+    if(bcs.EventType() == 2) {
+      GHistogramer::Get().Fill("PID/Decay_PID",3600,0,64000, bcs.I2SPin1.fCharge,
+          3600,0,32000, bcs.Pin1.fEcal);}
+    if(bcs.EventType() == 3) {
+      GHistogramer::Get().Fill("PID/LightIons_PID",3600,0,64000, bcs.I2SPin1.fCharge,
+          3600,0,32000, bcs.Pin1.fEcal);}
 
 
-  if(bcs.EventType() == 1){
-    GHistogramer::Get().Fill("position/DSSD_Implant", 40,0,40, Event.fDSSDHigh.Xpos,
-                                                 40,0,40, Event.fDSSDHigh.Ypos);}
-  if(bcs.EventType() == 2){
-    GHistogramer::Get().Fill("position/DSSD_Decay", 40,0,40, Event.fDSSDHigh.Xpos,
-                                                 40,0,40, Event.fDSSDHigh.Ypos);}
+    if(bcs.EventType() == 1){
+      GHistogramer::Get().Fill("position/DSSD_Implant", 40,0,40, Event.fDSSDHigh.Xpos,
+          40,0,40, Event.fDSSDHigh.Ypos);}
+    if(bcs.EventType() == 2){
+      GHistogramer::Get().Fill("position/DSSD_Decay", 40,0,40, Event.fDSSDHigh.Xpos,
+          40,0,40, Event.fDSSDHigh.Ypos);}
+
+
+/*
+    std::vector<double> frontE_high, backE_high;
+    std::vector<double> frontE_low,  backE_low;
+    std::vector<double> highE, lowE;
+
+    for(const auto& hit : event){
+      int    Id   = hit.GetId();
+      double ecal = hit.GetEcal();
+
+      switch(Id){
+        case 0 ... 39:                    // front High Gain
+          frontE_high.push_back(ecal);
+          highE.push_back(ecal);
+          break;
+        case 40 ... 79:                   // front Low Gain
+          frontE_low.push_back(ecal);
+          lowE.push_back(ecal);
+          break;
+        case 80 ... 119:                  // back High Gain
+          backE_high.push_back(ecal);
+          highE.push_back(ecal);
+          break;
+        case 120 ... 159:                 // back Low Gain
+          backE_low.push_back(ecal);
+          lowE.push_back(ecal);
+          break;
+      }
+
+
+      if(bcs.EventType() == 1 && Event.fDSSDHigh.HasGoodPosition() && Event.fDSSDLow.HasGoodPosition()){
+        bool allZero = frontE_high.empty() && frontE_low.empty() &&
+          backE_high.empty()  && backE_low.empty();
+
+        static bool printedHeaderImplant = false;
+        static int  printedRowsImplant   = 0;
+
+        if(!allZero && printedRowsImplant < 30){
+          double maxFrontHigh = frontE_high.empty() ? 0.0
+            : *std::max_element(frontE_high.begin(), frontE_high.end());
+          double maxFrontLow  = frontE_low.empty()  ? 0.0
+            : *std::max_element(frontE_low.begin(),  frontE_low.end());
+
+          auto printVec = [](const char* label, const std::vector<double>& v){
+            printf("%s: ", label);
+            for(double e : v) printf("%.1f ", e);
+            printf("\n");
+          };
+
+          if(!printedHeaderImplant){
+            printf("%8s %8s | %8s %8s | %8s %8s\n",
+                "nFH","nBH","nFL","nBL","MaxFH","MaxFL");
+            printedHeaderImplant = true;
+          }
+
+          printf("%8zu %8zu | %8zu %8zu | %8.1f %8.1f\n",
+              frontE_high.size(), backE_high.size(), frontE_low.size(), backE_low.size(),
+              maxFrontHigh, maxFrontLow);
+
+          printVec("frontE_high", frontE_high);
+          printVec("backE_high ", backE_high);
+          printVec("frontE_low ", frontE_low);
+          printVec("backE_low  ", backE_low);
+
+          printedRowsImplant++;
+        }
+      }
+
+
+      if(Event.fDSSDHigh.HasGoodPosition()){
+        for(double fe : frontE_high){
+          for(double be : backE_high){
+            GHistogramer::Get().Fill("diagnosis/FB_dE_high",2000,0,26000,fe,
+                2000,0,26000,be); } } }
+      if(Event.fDSSDLow.HasGoodPosition()){
+        for(double fe : frontE_low){
+          for(double be : backE_low){
+            GHistogramer::Get().Fill("diagnosis/FB_dE_low",1000,0,5000,fe,
+                1000,0,5000,be); } } }
+
+    }*/
+
+
+/*
+    if(Event.fDSSDHigh.HasGoodPosition()){
+      GHistogramer::Get().Fill("diagnosis/gated_FB_dE_high",2000,0,26000,Event.fDSSDHigh.fxMaxE,
+          2000,0,26000,Event.fDSSDHigh.fyMaxE);
+    }
+
+    if(Event.fDSSDLow.HasGoodPosition()){
+      GHistogramer::Get().Fill("diagnosis/gated_FB_dE_low",2000,0,26000,Event.fDSSDLow.fxMaxE,
+          2000,0,26000,Event.fDSSDLow.fyMaxE);
+    }
+
+
+    if(bcs.EventType() == 1) {
+      GHistogramer::Get().Fill("diagnosis/Implant_FB_dE_high",2000,0,26000,bcs.DSSDHigh.fxMaxE,
+          2000,0,26000,bcs.DSSDHigh.fyMaxE);}
+
+    if(bcs.EventType() == 2) {
+      GHistogramer::Get().Fill("diagnosis/Decay_FB_dE_high",2000,0,26000,bcs.DSSDHigh.fxMaxE,
+          2000,0,26000,bcs.DSSDHigh.fyMaxE);}
+    if(bcs.EventType() == 3) {
+      GHistogramer::Get().Fill("diagnosis/LightIon_FB_dE_high",2000,0,26000,bcs.DSSDHigh.fxMaxE,
+          2000,0,26000,bcs.DSSDHigh.fyMaxE);}
+    if(bcs.EventType() == 4) {
+      GHistogramer::Get().Fill("diagnosis/UnIdentified_FB_dE_high",2000,0,26000,bcs.DSSDHigh.fxMaxE,
+          2000,0,26000,bcs.DSSDHigh.fyMaxE);}
 */
 
 
-std::vector<double> frontE_high, backE_high;
-std::vector<double> frontE_low,  backE_low;
-std::vector<double> highE, lowE;
+// print statement
 
-for(const auto& hit : event){
-  int    Id   = hit.GetId();
-  double ecal = hit.GetEcal();
+//
+if(bcs.EventType() == 1 && Event.fDSSDLow.HasGoodPosition()){
+  printf("Low  -- front mult: %d | back mult: %d | front maxE: %.2f | back maxE: %.2f | \n",
+      Event.fDSSDLow.fxMult, Event.fDSSDLow.fyMult,
+      Event.fDSSDLow.fxMaxE, Event.fDSSDLow.fyMaxE);
+//
+printf("High -- front mult: %d | back mult: %d | front maxE: %.2f | back maxE: %.2f | \n",
+    Event.fDSSDHigh.fxMult, Event.fDSSDHigh.fyMult,
+    Event.fDSSDHigh.fxMaxE, Event.fDSSDHigh.fyMaxE);
 
-  switch(Id){
-    case 0 ... 39:                    // front High Gain
-      if(ecal < 17000){
-      frontE_high.push_back(ecal);
-      highE.push_back(ecal);}
-      break;
-    case 40 ... 79:                   // front Low Gain
-      if(ecal < 17000){
-      frontE_low.push_back(ecal);
-      lowE.push_back(ecal);}
-      break;
-    case 80 ... 119:                  // back High Gain
-      if(ecal < 17000){
-      backE_high.push_back(ecal);
-      highE.push_back(ecal);}
-      break;
-    case 120 ... 159:                 // back Low Gain
-      if(ecal < 17000){
-      backE_low.push_back(ecal);
-      lowE.push_back(ecal);}
-      break;
-  }
-
-
-double maxFrontHigh = frontE_high.empty() ? 0.0
-                      : *std::max_element(frontE_high.begin(), frontE_high.end());
-double maxFrontLow  = frontE_low.empty()  ? 0.0
-                      : *std::max_element(frontE_low.begin(),  frontE_low.end());
-
-static bool printedHeader = false;
-static int  printedRows   = 0;
-
-auto printVec = [](const char* label, const std::vector<double>& v){
-  printf("%s: ", label);
-  for(double e : v) printf("%.1f ", e);
-  printf("\n");
-};
-
-if(Event.fDSSDHigh.HasGoodPosition() && Event.fDSSDLow.HasGoodPosition()){
-  bool allZero = frontE_high.empty() && frontE_low.empty() &&
-                 backE_high.empty()  && backE_low.empty();
-
-  if(!allZero && printedRows < 30){
-    if(!printedHeader){
-      printf("%8s %8s | %8s %8s | %8s %8s\n",
-             "nFH","nBH","nFL","nBL","MaxFH","MaxFL");
-      printedHeader = true;
-    }
-
-    printf("%8zu %8zu | %8zu %8zu | %8.1f %8.1f\n",
-           frontE_high.size(), backE_high.size(), frontE_low.size(), backE_low.size(),
-           maxFrontHigh, maxFrontLow);
-
-    printVec("frontE_high", frontE_high);
-    printVec("backE_high ", backE_high);
-    printVec("frontE_low ", frontE_low);
-    printVec("backE_low  ", backE_low);
-
-    printedRows++;
-  }
 }
-
-if(Event.fDSSDHigh.HasGoodPosition()){
-for(double fe : frontE_high){
-  for(double be : backE_high){
-    GHistogramer::Get().Fill("diagnosis/FB_dE_high",2000,0,26000,fe,
-                                                     2000,0,26000,be); } } }
-if(Event.fDSSDLow.HasGoodPosition()){
-for(double fe : frontE_low){
-  for(double be : backE_low){
-    GHistogramer::Get().Fill("diagnosis/FB_dE_low",1000,0,5000,fe,
-                                                   1000,0,5000,be); } } }
 
 
 }
-}
+

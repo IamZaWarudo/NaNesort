@@ -6,7 +6,6 @@ add_library(GBCS SHARED
   GSSSD.cxx
   GLaBr.cxx
   GClover.cxx
-  GPixel.cxx
   PIDGates.cxx
 )
 
@@ -24,7 +23,6 @@ root_generate_dictionary(G__GBCS
   GSSSD.h
   GClover.h
   GLaBr.h
-  GPixel.h
   PIDGates.h
   MODULE GBCS
   LINKDEF Linkdef.h

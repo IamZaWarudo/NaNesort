@@ -141,68 +141,7 @@ void TOFCorrector::Copy(TOFCorrector &other) const {
 
 
 
-//  void TOFCorrector::FitTOF(TH2 *tof_time) {
-//    if(!tof_time)
-//      tof_time =fTofTime;    
-//  
-//    TH1D *py      = fTofTime->ProjectionY();
-//  
-//    TSpectrum *s = new TSpectrum;
-//    double threshold = 0.0005;
-//    int iterations =0;
-//    s->Search(py,1,"goff",threshold);
-//  
-//    while(s->GetNPeaks()!=EXPECTED_PEAKS && iterations<1000) {
-//      if(s->GetNPeaks()>EXPECTED_PEAKS)
-//        threshold+=threshold*.005;
-//      else  
-//        threshold-=threshold*.005;
-//      s->Search(py,1,"goff",threshold);
-//    }
-//  
-//    if(s->GetNPeaks()!=EXPECTED_PEAKS)
-//      return;
-//  
-//  
-//    for(int i=0;i<s->GetNPeaks();i++) {  
-//      //peaks.push_back(std::make_pair(s->GetX()[i],py->GetXaxis()->FindBin(s->GetX()[i])));
-//  
-//      double ntof = s->GetPositionX()[i];
-//      int   btof = py->GetXaxis()->FindBin(ntof);
-//      int   ltof = btof-TOF_WIDTH/2;
-//      int   htof = btof+TOF_WIDTH/2;
-//      //TH1D *p = tof->ProjectionX(Form("p%i",i+1),ltof,htof);
-//      TProfile *p = fTofTime->ProfileX(Form("p%i",i+1),ltof,htof);
-//  
-//      TGraph gr;
-//      for(int i=1;i<=p->GetNbinsX();i++) { 
-//        if(int(p->GetBinContent(i))!=0) {
-//          gr.AddPoint(p->GetBinCenter(i),p->GetBinContent(i));
-//        }
-//      }
-//      TSpline3 *spline = new TSpline3(Form("sp%i",i+1),gr.GetX(),gr.GetY(),gr.GetN());
-//  
-//      spline->SetLineWidth(2);
-//      spline->SetLineColor(2);
-//      spline->SetNpx(100000);
-//      //splines3->Draw("same");
-//      
-//      //new TCanvas;
-//      //gr.DrawClone("A*");
-//      //p->DrawClone("same");
-//      //spline->Draw("same");
-//  
-//      fExpectedBin.push_back(btof);
-//      fExpectedValue.push_back(ntof);
-//      fSplines.push_back(spline);
-//  
-//      printf("found peak %.1f:\t with limits %i to %i\n",ntof,ltof,htof);
-//    }
-//    fNPeaks =s->GetNPeaks();
-//  
-//  }
-
-
+  
 void TOFCorrector::FitTOF(TH2* tof_time) {
   TH2* histogram = tof_time ? tof_time : fTofTime;
 

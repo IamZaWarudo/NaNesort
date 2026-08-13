@@ -9,16 +9,17 @@ class GSSSD {
   GSSSD();
   ~GSSSD();
  
-  void Get(int strip, const ddasHit& hit);
+  void Unpack(const ddasHit& hit);
   void Reset();
 
 //  private:
 
-  int Strip;
-  double fCharge;
+  bool HasHit();
+  bool Hit = false;
+
   double fEcal;
-  double fTime;
-  int fId;
+  double Timestamp;
+  int strip;
 
   ClassDef(GSSSD,1);
 };

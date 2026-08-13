@@ -8,18 +8,37 @@ class GDSSD {
   GDSSD();
   ~GDSSD();
   
-  void Get(int strip, const ddasHit& hit);
+  void UnpackFront(const ddasHit& hit);
+  void UnpackBack(const ddasHit& hit);
+  
   void Reset();
 
+  bool HasGoodPosition();
 
 //  private:
 
-  int Strip;
-  double fCharge;
-  double fEcal;
-  double fTime;
+  int     fId;
+  double  fEcal;      
+  double  frontTimestamp;
+  double  backTimestamp;
+  int     xpos;       
+  int     ypos;       
+  int     Xpos;       
+  int     Ypos;       
+  bool    GoodX;      
+  bool    GoodY;      
+  
+  double  fxEsum;     
+  double  fxE;        
+  double  fxMaxE;     
+  double  fxMaxStrip; 
+  double  fyEsum;     
+  double  fyE;        
+  double  fyMaxE;     
+  double  fyMaxStrip; 
 
-  ClassDef(GDSSD,1);
+
+ ClassDef(GDSSD,1);
 };
 
 

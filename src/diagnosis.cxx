@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <filesystem>
 #include <cmath>
+#include <numeric>
+#include <algorithm>
 
 #include <TSystem.h>
 #include <memory>
@@ -20,12 +22,13 @@
 #include <GBCS.h>
 #include <globals.h>
 #include <PIDGates.h>
+#include <Unpacker.h>
 
 #include <TTree.h>
 #include <TFile.h>
 
 
-void ProcessEvent(GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrector* tofCorrector);
+void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrector* tofCorrector);
 
 // Progress bar eta
 static std::string FormatDuration(double seconds) {
@@ -111,12 +114,13 @@ int main(int argc, char** argv) {
   printf(HIDE_CURSOR);
   fflush(stdout);
 
-  GBCS bcs;
+  Unpacker Event;
   std::vector<ddasHit> event;
+  GBCS bcs;
 
   while(!converter.Finished() || !converter.Empty()) {
     if(converter.TryPop(event)) {
-      ProcessEvent(bcs, event, tofCorrector.get());
+      ProcessEvent(Event, bcs, event, tofCorrector.get());
       event.clear();
     }
 
@@ -176,167 +180,150 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-void ProcessEvent(GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrector* tofCorrector) {
+void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrector* tofCorrector) {
+  Event.Reset();
+  Event.Unpack(event);
   bcs.Reset();
-  bcs.Unpack(event);
+  bcs.Fill(Event);
 
 // all channel
   for(const auto& hit : event) {
     GHistogramer::Get().Fill("All_Channel/ecal", 10000, 0, 32000, hit.GetEcal(),
                                                    300,   0, 300,   hit.GetId());
     GHistogramer::Get().Fill("All_Channel/raw",  10000, 0, 32000, hit.GetCharge(),
-                                                   300,   0, 300,   hit.GetId());
-    if(bcs.fPin1.fTime > 0 && bcs.fPin2.fTime > 0){
-    GHistogramer::Get().Fill("PIN/Pin1vs2", 4000,0,16000, bcs.fPin1.fEcal,
-                                             4000,0,16000, bcs.fPin2.fEcal);}
+                                                   300,   0, 300,   hit.GetId()); }
+  if(Event.fDSSDHigh.HasGoodPosition()){
+    double dt = Event.fDSSDHigh.frontTimestamp - Event.fDSSDHigh.backTimestamp; 
+
+    GHistogramer::Get().Fill("position/DSSD_High", 40,0,40, Event.fDSSDHigh.Xpos,
+                                                   40,0,40, Event.fDSSDHigh.Ypos);
+
+    GHistogramer::Get().Fill("dt_front-back_High", 1000,0,1000,dt);}
+
+  if(Event.fDSSDLow.HasGoodPosition()){
+    double dt = Event.fDSSDLow.frontTimestamp - Event.fDSSDLow.backTimestamp; 
+
+    GHistogramer::Get().Fill("position/DSSD_Low", 40,0,40, Event.fDSSDLow.Xpos,
+                                                 40,0,40, Event.fDSSDLow.Ypos);
+
+    GHistogramer::Get().Fill("dt_front-back_Low", 1000,0,1000,dt);}
   
-    // GHistogramer::Get().Fill("Punch_Thru/SSSDlow_vs_LGF",16,0,16, bcs.fSSSDLow.Strip,
-    //                                                       40,0,40, bcs.FrontLowGain.Strip);
-    // GHistogramer::Get().Fill("Punch_Thru/SSSDEcal_vs_LGFEcal",4000,0,30000, bcs.fSSSDLow.fEcal,
-    //                                                         4000,0,30000, bcs.FrontLowGain.fEcal);
+  if(Event.fPin1.HasHit() && Event.fPin2.HasHit()){
+    GHistogramer::Get().Fill("PID/pin1_PID",3600,0,64000, Event.fI2SPin1.fCharge,
+                                            3600,0,32000, Event.fPin1.fEcal);
+    GHistogramer::Get().Fill("PID/pin2_PID",3600,0,32000, Event.fPin2.fCharge);
+    GHistogramer::Get().Fill("PID/I2TAC", 3600,0,32000, Event.fI2TAC.fEcal);}
 
-  }
- 
-  for(const auto& hit : bcs.fImplant) {
-    GHistogramer::Get().Fill("All_Channel/Implant_ecal", 10000, 0, 32000, hit.GetEcal(),
-                                                   300,   0, 300,   hit.GetId());
-    double implantfhbhdt =  std::abs(bcs.FrontHighGain.fTime - bcs.BackHighGain.fTime);
-    GHistogramer::Get().Fill("dt/implantfhbhdt",  1000, 0,500, implantfhbhdt);
- 
-    GHistogramer::Get().Fill("PIN/Pin1vs2_veto", 10000,0,16000, bcs.fPin1.fEcal,
-                                             10000,0,16000, bcs.fPin2.fEcal);
+  if(Event.fPin1.Timestamp > 10 && Event.fI2SPin1.Timestamp > 10){
+  const double runtime = Event.fPin1.Timestamp / 1.e8;
+  const double rawTOF  = Event.fI2SPin1.fCharge;
 
-   // GHistogramer::Get().Fill("Punch_Thru/(Imp)SSSDlow_vs_LGF",16,0,16, bcs.fSSSDLow.Strip,
-   //                                                       40,0,40, bcs.FrontLowGain.Strip);
-
-   // GHistogramer::Get().Fill("Punch_Thru/(Imp)SSSDEcal_vs_LGFEcal",4000,0,30000, bcs.fSSSDLow.fEcal,
-   //                                                          4000,0,30000, bcs.FrontLowGain.fEcal);
-
-
-  }
-
-  for(const auto& hit : bcs.fDecay) {
-    GHistogramer::Get().Fill("All_Channel/Decay_ecal", 16000, 0, 64000, hit.GetEcal(),
-                                                   300,   0, 300,   hit.GetId());
-    double decayfhbhdt =  std::abs(bcs.FrontHighGain.fTime - bcs.BackHighGain.fTime);
-    GHistogramer::Get().Fill("dt/decayfhbhdt",  1000, 0,500, decayfhbhdt);
-
-  }
-/*
-  for(const auto& hit : bcs.fPDCheck) {
-  double dtfl = bcs.FrontLowGain.fTime - bcs.fPin1.fTime;
-  double dtbl = bcs.BackLowGain.fTime - bcs.fPin1.fTime;
-  double dtfh = bcs.FrontHighGain.fTime - bcs.fPin1.fTime;
-  double dtbh = bcs.BackHighGain.fTime - bcs.fPin1.fTime;
-  double dtfhbh = std::abs(bcs.FrontHighGain.fTime - bcs.BackHighGain.fTime);
-  double dtflbl = std::abs(bcs.FrontLowGain.fTime - bcs.BackLowGain.fTime);
-  double dtflfh = std::abs(bcs.FrontHighGain.fTime - bcs.FrontLowGain.fTime);
-  double dtblbh = std::abs(bcs.BackHighGain.fTime - bcs.BackLowGain.fTime);
-  double dtpin1n2 = bcs.fPin2.fTime - bcs.fPin1.fTime;
-
-    GHistogramer::Get().Fill("dt/Pin-fl",  1000, 0,500, dtfl);
-    GHistogramer::Get().Fill("dt/Pin-bl",  1000, 0,500, dtbl);
-    GHistogramer::Get().Fill("dt/Pin-fh",  1000, 0,500, dtfh);
-    GHistogramer::Get().Fill("dt/Pin-bh",  1000, 0,500, dtbh);
-    GHistogramer::Get().Fill("dt/dtfhbh",  1000, 0,500, dtfhbh);
-    GHistogramer::Get().Fill("dt/dtflbl",  1000, 0,500, dtflbl);
-    GHistogramer::Get().Fill("dt/dtflfh",  1000, 0,500, dtflfh);
-    GHistogramer::Get().Fill("dt/dtblbh",  1000, 0,500, dtblbh);
-    GHistogramer::Get().Fill("dt/dtpin1n2", 1000,0,500, dtpin1n2);
-}
-
-  for(const auto& hit : bcs.fPSCheck) {
-  double dtsssdlow = bcs.fSSSDLow.fTime - bcs.fPin1.fTime;
-  double dtsssdhigh = bcs.fSSSDHigh.fTime - bcs.fPin1.fTime;
-  double dtsssdlowhigh = std::abs(bcs.fSSSDHigh.fTime - bcs.fSSSDLow.fTime);
-
-
-  double dt_dssd_sssd_low = bcs.fSSSDLow.fTime - bcs.FrontLowGain.fTime; 
-    GHistogramer::Get().Fill("dt/Pin-sssdlow",  1000, 0,500, dtsssdlow);
-    GHistogramer::Get().Fill("dt/Pin-sssdhigh",  1000, 0,500, dtsssdhigh);
-    GHistogramer::Get().Fill("dt/dtsssdLowHigh",  1000, 0,500, dtsssdlowhigh);
-  }
-*/
-// PID & TOF
-  if(bcs.fPin1.fTime > 10 && bcs.fPin2.fTime > 10 && bcs.fI2S.fTime > 10) {
-    const double runtime = bcs.fPin1.fTime / 1.e8;
-    const double rawTOF  = bcs.fI2S.fCharge;
-    const double dE      = bcs.fPin1.fEcal;
-    const double runtime2 = bcs.fPin2.fTime / 1.e8;
-    const double dE2      = bcs.fPin2.fEcal;
-
-      GHistogramer::Get().Fill("TOF/tof2_cr", 3600, 0, 7200,  runtime2,
-                                             4000, 0, 64000, rawTOF);
-
-      GHistogramer::Get().Fill("PID/pid2_cr", 3600, 0, 64000, rawTOF,
-                                             4000, 0, 16000, dE2);
-
-    double correctedTOF = rawTOF;
-    if(tofCorrector) {
-      correctedTOF = tofCorrector->Correct(rawTOF, runtime);
-
-      GHistogramer::Get().Fill("TOF/tof1_cr", 3600, 0, 7200,  runtime,
-                                             4000, 0, 64000, correctedTOF);
-
-      GHistogramer::Get().Fill("PID/pid1_cr", 2000, 0, 64000, correctedTOF,
-                                             3000, 0, 16000, dE);
-        }
-}
-
-  for(const auto& hit : bcs.fImplant) {
-    if(bcs.fPin1.fTime > 10 && bcs.fI2S.fTime > 10) {
-    const double runtime = bcs.fPin1.fTime / 1.e8;
-    const double rawTOF  = bcs.fI2S.fCharge;
-    const double dE      = bcs.fPin1.fEcal;
-
-    double correctedTOF = rawTOF;
-    if(tofCorrector) {
-      GHistogramer::Get().Fill("TOF/tof_with_veto", 3600, 0, 7200,  runtime,
-                                             4000, 0, 64000, correctedTOF);
-
-      correctedTOF = tofCorrector->Correct(rawTOF, runtime);
-      GHistogramer::Get().Fill("PID/pid_with_veto", 2000, 0, 64000, correctedTOF,
-                                             3000, 0, 16000, dE);}
-        }
-  }
-
-
-//Position
-  if(bcs.fPixel.Implant()) {
-    GHistogramer::Get().Fill("dssd/implant_map", 40, 0, 40, bcs.fPixel.ImPixel[0],
-                                                 40, 0, 40, bcs.fPixel.ImPixel[1]);
-}
-
-  if(bcs.fPixel.Decay()) {
-    GHistogramer::Get().Fill("dssd/decay_map", 40, 0, 40, bcs.fPixel.DePixel[0],
-                                               40, 0, 40, bcs.fPixel.DePixel[1]);
-}
-
-
-/*
-// for TOF and PID only Pin1 and I2S used, because the other detectors failed and are unreliable
-  if(bcs.fPin1.fTime > 10 && bcs.fI2S.fTime > 10) {
-    const double runtime = bcs.fPin1.fTime / 1.e8;
-    const double rawTOF  = bcs.fI2S.fCharge;
-    const double dE      = bcs.fPin1.fEcal;
-
-// TOF
     GHistogramer::Get().Fill("TOF/tof_raw", 3600, 0, 7200,  runtime,
                                             4000, 0, 64000, rawTOF);
-// PID
-    GHistogramer::Get().Fill("PID/pid_raw", 3600, 0, 64000, rawTOF,
-                                            4000, 0, 16000, dE);
-    double correctedTOF = rawTOF;
-    if(tofCorrector) {
-      correctedTOF = tofCorrector->Correct(rawTOF, runtime);
+  }
 
-      GHistogramer::Get().Fill("TOF/tof_cr", 3600, 0, 7200,  runtime,
-                                             4000, 0, 64000, correctedTOF);
+/*  if(bcs.EventType() == 1) {
+    GHistogramer::Get().Fill("PID/Implant_PID",3600,0,64000, Event.fI2SPin1.fCharge,
+                                            3600,0,32000, Event.fPin1.fEcal);}
 
-      GHistogramer::Get().Fill("PID/pid_cr", 3600, 0, 64000, correctedTOF,
-                                             4000, 0, 16000, dE);
-       }
-}
+  if(bcs.EventType() == 2) {
+    GHistogramer::Get().Fill("PID/Decay_PID",3600,0,64000, Event.fI2SPin1.fCharge,
+                                            3600,0,32000, Event.fPin1.fEcal);}
+  if(bcs.EventType() == 3) {
+    GHistogramer::Get().Fill("PID/LightIons_PID",3600,0,64000, Event.fI2SPin1.fCharge,
+                                            3600,0,32000, Event.fPin1.fEcal);}
+
+
+  if(bcs.EventType() == 1){
+    GHistogramer::Get().Fill("position/DSSD_Implant", 40,0,40, Event.fDSSDHigh.Xpos,
+                                                 40,0,40, Event.fDSSDHigh.Ypos);}
+  if(bcs.EventType() == 2){
+    GHistogramer::Get().Fill("position/DSSD_Decay", 40,0,40, Event.fDSSDHigh.Xpos,
+                                                 40,0,40, Event.fDSSDHigh.Ypos);}
 */
 
+
+std::vector<double> frontE_high, backE_high;
+std::vector<double> frontE_low,  backE_low;
+std::vector<double> highE, lowE;
+
+for(const auto& hit : event){
+  int    Id   = hit.GetId();
+  double ecal = hit.GetEcal();
+
+  switch(Id){
+    case 0 ... 39:                    // front High Gain
+      if(ecal < 17000){
+      frontE_high.push_back(ecal);
+      highE.push_back(ecal);}
+      break;
+    case 40 ... 79:                   // front Low Gain
+      if(ecal < 17000){
+      frontE_low.push_back(ecal);
+      lowE.push_back(ecal);}
+      break;
+    case 80 ... 119:                  // back High Gain
+      if(ecal < 17000){
+      backE_high.push_back(ecal);
+      highE.push_back(ecal);}
+      break;
+    case 120 ... 159:                 // back Low Gain
+      if(ecal < 17000){
+      backE_low.push_back(ecal);
+      lowE.push_back(ecal);}
+      break;
+  }
+
+
+double maxFrontHigh = frontE_high.empty() ? 0.0
+                      : *std::max_element(frontE_high.begin(), frontE_high.end());
+double maxFrontLow  = frontE_low.empty()  ? 0.0
+                      : *std::max_element(frontE_low.begin(),  frontE_low.end());
+
+static bool printedHeader = false;
+static int  printedRows   = 0;
+
+auto printVec = [](const char* label, const std::vector<double>& v){
+  printf("%s: ", label);
+  for(double e : v) printf("%.1f ", e);
+  printf("\n");
+};
+
+if(Event.fDSSDHigh.HasGoodPosition() && Event.fDSSDLow.HasGoodPosition()){
+  bool allZero = frontE_high.empty() && frontE_low.empty() &&
+                 backE_high.empty()  && backE_low.empty();
+
+  if(!allZero && printedRows < 30){
+    if(!printedHeader){
+      printf("%8s %8s | %8s %8s | %8s %8s\n",
+             "nFH","nBH","nFL","nBL","MaxFH","MaxFL");
+      printedHeader = true;
+    }
+
+    printf("%8zu %8zu | %8zu %8zu | %8.1f %8.1f\n",
+           frontE_high.size(), backE_high.size(), frontE_low.size(), backE_low.size(),
+           maxFrontHigh, maxFrontLow);
+
+    printVec("frontE_high", frontE_high);
+    printVec("backE_high ", backE_high);
+    printVec("frontE_low ", frontE_low);
+    printVec("backE_low  ", backE_low);
+
+    printedRows++;
+  }
+}
+
+if(Event.fDSSDHigh.HasGoodPosition()){
+for(double fe : frontE_high){
+  for(double be : backE_high){
+    GHistogramer::Get().Fill("diagnosis/FB_dE_high",2000,0,26000,fe,
+                                                     2000,0,26000,be); } } }
+if(Event.fDSSDLow.HasGoodPosition()){
+for(double fe : frontE_low){
+  for(double be : backE_low){
+    GHistogramer::Get().Fill("diagnosis/FB_dE_low",1000,0,5000,fe,
+                                                   1000,0,5000,be); } } }
+
+
+}
 }

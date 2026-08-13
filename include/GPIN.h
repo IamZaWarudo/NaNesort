@@ -8,13 +8,15 @@ class GPIN {
   GPIN();
   ~GPIN();
   
-  void Get(const ddasHit& hit);
+  void Unpack(const ddasHit& hit);
   void Reset();
+
+  bool HasHit();
+  bool Hit = false;
 
   double fCharge;
   double fEcal;
-  double fTime;
-  double fTimestamp;
+  double Timestamp;
 
   ClassDef(GPIN,1);
 };

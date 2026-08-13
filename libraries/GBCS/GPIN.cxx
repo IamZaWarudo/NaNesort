@@ -1,20 +1,25 @@
-
+#include <ddasHit.h>
 #include <GPIN.h>
 
-GPIN::GPIN() { Reset(); }
+GPIN::GPIN() { Reset();  }
 GPIN::~GPIN() {}
 
 void GPIN::Reset() {
-  fCharge = 0;
-  fEcal   = 0;
-  fTime   = 0;
-  fTimestamp = 0;
+  fEcal      = 0;
+  Timestamp  = 0;
+  fCharge    = 0;
+  Hit     = false;
 }
 
-void GPIN::Get(const ddasHit& hit){
-  
-  fTime   = hit.GetTime();
+void GPIN::Unpack(const ddasHit& hit) {   
+ 
   fCharge = hit.GetCharge();
-  fEcal   = hit.GetEcal();
-  fTimestamp = hit.GetTimestamp();
+  Timestamp = hit.GetTimestamp();
+  fEcal = hit.GetEcal();
+  Hit = true;   
 }
+
+bool GPIN::HasHit(){ 
+return Hit;
+}
+

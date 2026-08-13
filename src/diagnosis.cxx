@@ -196,180 +196,25 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
         300,   0, 300,   hit.GetId());
     GHistogramer::Get().Fill("All_Channel/raw",  10000, 0, 32000, hit.GetCharge(),
         300,   0, 300,   hit.GetId()); }
-    if(Event.fDSSDHigh.HasGoodPosition()){
-      double dt = Event.fDSSDHigh.frontTimestamp - Event.fDSSDHigh.backTimestamp; 
-
-      GHistogramer::Get().Fill("position/DSSD_High", 40,0,40, Event.fDSSDHigh.Xpos,
-          40,0,40, Event.fDSSDHigh.Ypos);
-
-      GHistogramer::Get().Fill("dt_front-back_High", 1000,0,1000,dt);}
-
-    if(Event.fDSSDLow.HasGoodPosition()){
-      double dt = Event.fDSSDLow.frontTimestamp - Event.fDSSDLow.backTimestamp; 
-
-      GHistogramer::Get().Fill("position/DSSD_Low", 40,0,40, Event.fDSSDLow.Xpos,
-          40,0,40, Event.fDSSDLow.Ypos);
-
-      GHistogramer::Get().Fill("dt_front-back_Low", 1000,0,1000,dt);}
-
+    
     if(Event.fPin1.HasHit() && Event.fPin2.HasHit()){
-      GHistogramer::Get().Fill("PID/pin1_PID",3600,0,64000, Event.fI2SPin1.fCharge,
-          3600,0,32000, Event.fPin1.fEcal);
+      GHistogramer::Get().Fill("PID/pin1_PID",3600,0,32000, Event.fI2SPin1.fCharge,
+                                              3600,0,20000, Event.fPin1.fEcal);
       GHistogramer::Get().Fill("PID/pin2_PID",3600,0,32000, Event.fPin2.fCharge);
-      GHistogramer::Get().Fill("PID/I2TAC", 3600,0,32000, Event.fI2TAC.fEcal);}
+   }
 
-    if(Event.fPin1.Timestamp > 10 && Event.fI2SPin1.Timestamp > 10){
-      const double runtime = Event.fPin1.Timestamp / 1.e8;
-      const double rawTOF  = Event.fI2SPin1.fCharge;
-
-      GHistogramer::Get().Fill("TOF/tof_raw", 3600, 0, 7200,  runtime,
-          4000, 0, 64000, rawTOF);
-    }
 
     if(bcs.EventType() == 1) {
       GHistogramer::Get().Fill("PID/Implant_PID",3600,0,64000, bcs.I2SPin1.fCharge,
-          3600,0,32000, bcs.Pin1.fEcal);}
+                                                3600,0,32000, bcs.Pin1.fEcal);}
 
     if(bcs.EventType() == 2) {
       GHistogramer::Get().Fill("PID/Decay_PID",3600,0,64000, bcs.I2SPin1.fCharge,
-          3600,0,32000, bcs.Pin1.fEcal);}
+                                               3600,0,32000, bcs.Pin1.fEcal);}
     if(bcs.EventType() == 3) {
       GHistogramer::Get().Fill("PID/LightIons_PID",3600,0,64000, bcs.I2SPin1.fCharge,
-          3600,0,32000, bcs.Pin1.fEcal);}
+                                                   3600,0,32000, bcs.Pin1.fEcal);}
 
 
-    if(bcs.EventType() == 1){
-      GHistogramer::Get().Fill("position/DSSD_Implant", 40,0,40, Event.fDSSDHigh.Xpos,
-          40,0,40, Event.fDSSDHigh.Ypos);}
-    if(bcs.EventType() == 2){
-      GHistogramer::Get().Fill("position/DSSD_Decay", 40,0,40, Event.fDSSDHigh.Xpos,
-          40,0,40, Event.fDSSDHigh.Ypos);}
-
-
-/*
-    std::vector<double> frontE_high, backE_high;
-    std::vector<double> frontE_low,  backE_low;
-    std::vector<double> highE, lowE;
-
-    for(const auto& hit : event){
-      int    Id   = hit.GetId();
-      double ecal = hit.GetEcal();
-
-      switch(Id){
-        case 0 ... 39:                    // front High Gain
-          frontE_high.push_back(ecal);
-          highE.push_back(ecal);
-          break;
-        case 40 ... 79:                   // front Low Gain
-          frontE_low.push_back(ecal);
-          lowE.push_back(ecal);
-          break;
-        case 80 ... 119:                  // back High Gain
-          backE_high.push_back(ecal);
-          highE.push_back(ecal);
-          break;
-        case 120 ... 159:                 // back Low Gain
-          backE_low.push_back(ecal);
-          lowE.push_back(ecal);
-          break;
-      }
-
-
-      if(bcs.EventType() == 1 && Event.fDSSDHigh.HasGoodPosition() && Event.fDSSDLow.HasGoodPosition()){
-        bool allZero = frontE_high.empty() && frontE_low.empty() &&
-          backE_high.empty()  && backE_low.empty();
-
-        static bool printedHeaderImplant = false;
-        static int  printedRowsImplant   = 0;
-
-        if(!allZero && printedRowsImplant < 30){
-          double maxFrontHigh = frontE_high.empty() ? 0.0
-            : *std::max_element(frontE_high.begin(), frontE_high.end());
-          double maxFrontLow  = frontE_low.empty()  ? 0.0
-            : *std::max_element(frontE_low.begin(),  frontE_low.end());
-
-          auto printVec = [](const char* label, const std::vector<double>& v){
-            printf("%s: ", label);
-            for(double e : v) printf("%.1f ", e);
-            printf("\n");
-          };
-
-          if(!printedHeaderImplant){
-            printf("%8s %8s | %8s %8s | %8s %8s\n",
-                "nFH","nBH","nFL","nBL","MaxFH","MaxFL");
-            printedHeaderImplant = true;
-          }
-
-          printf("%8zu %8zu | %8zu %8zu | %8.1f %8.1f\n",
-              frontE_high.size(), backE_high.size(), frontE_low.size(), backE_low.size(),
-              maxFrontHigh, maxFrontLow);
-
-          printVec("frontE_high", frontE_high);
-          printVec("backE_high ", backE_high);
-          printVec("frontE_low ", frontE_low);
-          printVec("backE_low  ", backE_low);
-
-          printedRowsImplant++;
-        }
-      }
-
-
-      if(Event.fDSSDHigh.HasGoodPosition()){
-        for(double fe : frontE_high){
-          for(double be : backE_high){
-            GHistogramer::Get().Fill("diagnosis/FB_dE_high",2000,0,26000,fe,
-                2000,0,26000,be); } } }
-      if(Event.fDSSDLow.HasGoodPosition()){
-        for(double fe : frontE_low){
-          for(double be : backE_low){
-            GHistogramer::Get().Fill("diagnosis/FB_dE_low",1000,0,5000,fe,
-                1000,0,5000,be); } } }
-
-    }*/
-
-
-/*
-    if(Event.fDSSDHigh.HasGoodPosition()){
-      GHistogramer::Get().Fill("diagnosis/gated_FB_dE_high",2000,0,26000,Event.fDSSDHigh.fxMaxE,
-          2000,0,26000,Event.fDSSDHigh.fyMaxE);
-    }
-
-    if(Event.fDSSDLow.HasGoodPosition()){
-      GHistogramer::Get().Fill("diagnosis/gated_FB_dE_low",2000,0,26000,Event.fDSSDLow.fxMaxE,
-          2000,0,26000,Event.fDSSDLow.fyMaxE);
-    }
-
-
-    if(bcs.EventType() == 1) {
-      GHistogramer::Get().Fill("diagnosis/Implant_FB_dE_high",2000,0,26000,bcs.DSSDHigh.fxMaxE,
-          2000,0,26000,bcs.DSSDHigh.fyMaxE);}
-
-    if(bcs.EventType() == 2) {
-      GHistogramer::Get().Fill("diagnosis/Decay_FB_dE_high",2000,0,26000,bcs.DSSDHigh.fxMaxE,
-          2000,0,26000,bcs.DSSDHigh.fyMaxE);}
-    if(bcs.EventType() == 3) {
-      GHistogramer::Get().Fill("diagnosis/LightIon_FB_dE_high",2000,0,26000,bcs.DSSDHigh.fxMaxE,
-          2000,0,26000,bcs.DSSDHigh.fyMaxE);}
-    if(bcs.EventType() == 4) {
-      GHistogramer::Get().Fill("diagnosis/UnIdentified_FB_dE_high",2000,0,26000,bcs.DSSDHigh.fxMaxE,
-          2000,0,26000,bcs.DSSDHigh.fyMaxE);}
-*/
-
-
-// print statement
-
-//
-if(bcs.EventType() == 1 && Event.fDSSDLow.HasGoodPosition()){
-  printf("Low  -- front mult: %d | back mult: %d | front maxE: %.2f | back maxE: %.2f | \n",
-      Event.fDSSDLow.fxMult, Event.fDSSDLow.fyMult,
-      Event.fDSSDLow.fxMaxE, Event.fDSSDLow.fyMaxE);
-//
-printf("High -- front mult: %d | back mult: %d | front maxE: %.2f | back maxE: %.2f | \n",
-    Event.fDSSDHigh.fxMult, Event.fDSSDHigh.fyMult,
-    Event.fDSSDHigh.fxMaxE, Event.fDSSDHigh.fyMaxE);
-
-}
-
-
-}
+  }
 

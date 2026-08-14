@@ -15,13 +15,15 @@ class GSSSD {
 //  private:
 
   bool HasHit();
-  bool Hit = false;
+  //bool Hit = false;
 
-  double fEcal;
-  double Timestamp;
-  int strip;
+  double fSum;
+  double fTimestamp;
+  //int strip;
+  std::vector<int> fStrips;
+  std::vector<double> fEcal;
 
-  ClassDef(GSSSD,1);
+  ClassDef(GSSSD,2);
 };
 
 

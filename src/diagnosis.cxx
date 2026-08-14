@@ -224,6 +224,9 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
   GHistogramer::Get().Fill("PID/PID_Total",3600,0,25000, tof,
                                            3600,0,15000, dE);
 
+  for(auto &e : Event.fSSSDLow.fEcal)
+    GHistogramer::Get().Fill("PID/PID_SSSDL_tof", 3600,0,25000, tof,                                3600,0,25000, e);
+
   if(!hasSSSDL)
     GHistogramer::Get().Fill("PID/PID_nSSSDL",3600,0,25000, tof,
                                               3600,0,15000, dE);
@@ -240,6 +243,7 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
     GHistogramer::Get().Fill("PID/PID_DSSDGood_nSSSDL",3600,0,25000, tof,
                                                3600,0,15000, dE);
 
+  
 
 }  
 

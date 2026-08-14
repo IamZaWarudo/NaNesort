@@ -7,6 +7,7 @@ GSSSD::~GSSSD() {}
 void GSSSD::Reset() {
   fSum        = 0;
   fTimestamp  = 0;
+  fStripTime.clear();
   fStrips.clear();
   fEcal.clear();
 }
@@ -17,7 +18,8 @@ void GSSSD::Unpack(const ddasHit& hit) {
     fTimestamp = hit.GetTimestamp();
   else if(hit.GetTimestamp()<fTimestamp)
     fTimestamp = hit.GetTimestamp();
-  
+  fStripTime.push_back(hit.GetTimestamp());
+
   fSum += hit.GetEcal();
   fEcal.push_back(hit.GetEcal());
   if(Id >= 160 && Id <= 175){

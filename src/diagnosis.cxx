@@ -219,7 +219,16 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
   double dE  = Event.fPin1.fEcal;
   double tof = Event.fI2SPin1.fCharge; 
 
+  double dtPin = Event.fPin1.fTimestamp - Event.fPin2.fTimestamp;
+
+  GHistogramer::Get().Fill("Pin_dt",1000,-500,500,dtPin);
+
   if(!hasPin) return;
+
+  for(int i=0;i<Event.fSSSDLow.fStripTime.size();i++) {
+    double dt = Event.fPin1.fTimestamp - Event.fSSSDLow.fStripTime.at(i); 
+    GHistogramer::Get().Fill("sssd_dt", 1000,-500,500,dt,20,0,20,Event.fSSSDLow.fStrips.at(i));
+  }
 
   GHistogramer::Get().Fill("PID/PID_Total",3600,0,25000, tof,
                                            3600,0,15000, dE);

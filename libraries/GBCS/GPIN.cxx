@@ -6,14 +6,14 @@ GPIN::~GPIN() {}
 
 void GPIN::Reset() {
   fEcal      = 0;
-  Timestamp  = 0;
+  fTimestamp  = 0;
   fCharge    = 0;
 }
 
 void GPIN::Unpack(const ddasHit& hit) {   
  
   fCharge = hit.GetCharge();
-  Timestamp = hit.GetTimestamp();
+  fTimestamp = hit.GetTimestamp();
   fEcal = hit.GetEcal();
 }
 

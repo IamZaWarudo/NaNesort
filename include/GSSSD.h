@@ -20,7 +20,8 @@ class GSSSD {
   double fSum;
   double fTimestamp;
   //int strip;
-  std::vector<int> fStrips;
+  std::vector<double> fStripTime;
+  std::vector<int>    fStrips;
   std::vector<double> fEcal;
 
   ClassDef(GSSSD,2);

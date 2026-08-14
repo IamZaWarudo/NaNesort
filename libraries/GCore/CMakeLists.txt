@@ -1,7 +1,7 @@
 #this will compile the current library.
 add_library(GCORE SHARED 
   globals.cxx
-  ijen.cxx
+  Ijen.cxx
 )
 
 target_include_directories(GCORE

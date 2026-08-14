@@ -13,6 +13,7 @@ class GDSSD {
   
   void Reset();
 
+  bool HasHit();
   bool HasGoodPosition();
 
 //  private:
@@ -27,7 +28,10 @@ class GDSSD {
   int     Ypos;       
   bool    GoodX;      
   bool    GoodY;      
-  
+ 
+  bool    FrontHit;
+  bool    BackHit;
+
   double  fxEsum;     
   double  fxE;        
   double  fxMaxE;     

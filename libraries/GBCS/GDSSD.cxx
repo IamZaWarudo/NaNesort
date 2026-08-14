@@ -18,6 +18,9 @@ void GDSSD::Reset() {
   GoodX      = false;
   GoodY      = false;
 
+  FrontHit   = false;
+  BackHit    = false;
+
   fxEsum     = 0; 
   fxE        = 0; 
   fxMaxE     = 0; 
@@ -52,6 +55,7 @@ void GDSSD::UnpackFront(const ddasHit& hit) {
     fxMaxE = fEcal;
     fxMaxStrip = xpos;}
 
+  FrontHit = true;  
 }
 
 void GDSSD::UnpackBack(const ddasHit& hit) {   
@@ -75,7 +79,15 @@ void GDSSD::UnpackBack(const ddasHit& hit) {
     fyMaxE = fEcal;
     fyMaxStrip = ypos;}
 
+
+  BackHit = true;
 }
+
+
+bool GDSSD::HasHit(){
+ return FrontHit && BackHit;
+} 
+
 
 bool GDSSD::HasGoodPosition() {
   double dt = frontTimestamp - backTimestamp;

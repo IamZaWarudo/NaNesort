@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
   if(inputFiles.empty()) { printf("No EVT files supplied\n"); return 1; }
   std::sort(inputFiles.begin(), inputFiles.end());
 
-//  std::string homedir = std::getenv("HOME");
+  //  std::string homedir = std::getenv("HOME");
 
   std::string PATH = programPath();
   GChannel::ReadDetmap(Form("%s/../cals/detmapfix.tsv", PATH.c_str()));
@@ -200,61 +200,46 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
     GHistogramer::Get().Fill("All_Channel/raw",  10000, 0, 32000, hit.GetCharge(),
         300,   0, 300,   hit.GetId());
 
-   if(Event.fPin1.HasHit() && Event.fPin2.HasHit() && !Event.fSSSDLow.HasHit()){  
-    GHistogramer::Get().Fill("All_Channel/Z_ecal", 10000, 0, 32000, hit.GetEcal(),
-        300,   0, 300,   hit.GetId());}
+    if(Event.fPin1.HasHit() && Event.fPin2.HasHit() && !Event.fSSSDLow.HasHit()){  
+      GHistogramer::Get().Fill("All_Channel/Z_ecal", 10000, 0, 32000, hit.GetEcal(),
+          300,   0, 300,   hit.GetId());}
 
-   if(!Event.fPin1.HasHit() && !Event.fPin2.HasHit() && Event.fDSSDHigh.HasHit() && !Event.fSSSDLow.HasHit() && !Event.fSSSDHigh.HasHit()){
-    GHistogramer::Get().Fill("All_Channel/decayLogic_ecal", 10000, 0, 32000, hit.GetEcal(),
-        300,   0, 300,   hit.GetId());}
+    if(!Event.fPin1.HasHit() && !Event.fPin2.HasHit() && Event.fDSSDHigh.HasHit() && !Event.fSSSDLow.HasHit() && !Event.fSSSDHigh.HasHit()){
+      GHistogramer::Get().Fill("All_Channel/decayLogic_ecal", 10000, 0, 32000, hit.GetEcal(),
+          300,   0, 300,   hit.GetId());}
 
- }
+  }
 
+  bool hasPin      = Event.fPin1.HasHit() && Event.fPin2.HasHit(); 
+  bool hasDSSD     = Event.fDSSDHigh.HasHit();
+  bool hasDSSDGood = Event.fDSSDHigh.HasGoodPosition(); 
+  bool hasSSSDL    = Event.fSSSDLow.HasHit();
+  bool hasSSSDH    = Event.fSSSDHigh.HasHit();
 
-// Event - level filling
-  if(Event.fPin1.HasHit() && Event.fPin2.HasHit()){
-    GHistogramer::Get().Fill("PID/PID",3600,0,25000, Event.fI2SPin1.fCharge,
-                                            3600,0,15000, Event.fPin1.fEcal);}
+  double dE  = Event.fPin1.fEcal;
+  double tof = Event.fI2SPin1.fCharge; 
 
+  if(!hasPin) return;
 
+  GHistogramer::Get().Fill("PID/PID_Total",3600,0,25000, tof,
+                                           3600,0,15000, dE);
 
-// Veto Check
+  if(!hasSSSDL)
+    GHistogramer::Get().Fill("PID/PID_nSSSDL",3600,0,25000, tof,
+                                              3600,0,15000, dE);
+  if(hasDSSD)
+    GHistogramer::Get().Fill("PID/PID_DSSD",3600,0,25000, tof,
+                                            3600,0,15000, dE);
+  if(hasDSSDGood)
+    GHistogramer::Get().Fill("PID/PID_DSSDGood",3600,0,25000, tof,
+                                               3600,0,15000, dE);
+  if(hasDSSD && !hasSSSDL)
+    GHistogramer::Get().Fill("PID/PID_DSSD_nSSSDL",3600,0,25000, tof,
+                                               3600,0,15000, dE);
+  if(hasDSSDGood && !hasSSSDL)
+    GHistogramer::Get().Fill("PID/PID_DSSDGood_nSSSDL",3600,0,25000, tof,
+                                               3600,0,15000, dE);
 
-// G  -- this one should be weird
-  if(Event.fPin1.HasHit() && Event.fPin2.HasHit() && Event.fDSSDLow.HasHit() && Event.fDSSDHigh.HasHit() && Event.fSSSDLow.HasHit() && Event.fSSSDHigh.HasHit()) {
-    GHistogramer::Get().Fill("PID/G_PID",3600,0,25000, Event.fI2SPin1.fCharge,
-                                            3600,0,15000, Event.fPin1.fEcal);}
-// H
-  if(Event.fPin1.HasHit() && Event.fPin2.HasHit() && Event.fDSSDHigh.HasHit() && Event.fSSSDLow.HasHit() && Event.fSSSDHigh.HasHit()) {
-    GHistogramer::Get().Fill("PID/H_PID",3600,0,25000, Event.fI2SPin1.fCharge,
-                                            3600,0,15000, Event.fPin1.fEcal);}
-
-
-// Implant Check
-
-// A -- this one should be weird
-  if(Event.fPin1.HasHit() && Event.fPin2.HasHit() && Event.fDSSDLow.HasHit() && Event.fDSSDHigh.HasHit() && !Event.fSSSDLow.HasHit() && !Event.fSSSDHigh.HasHit()) {
-    GHistogramer::Get().Fill("PID/A_PID",3600,0,25000, Event.fI2SPin1.fCharge,
-                                            3600,0,15000, Event.fPin1.fEcal);}
-// B
-  if(Event.fPin1.HasHit() && Event.fPin2.HasHit() && !Event.fSSSDLow.HasHit()) {
-    GHistogramer::Get().Fill("PID/B_PID",3600,0,25000, Event.fI2SPin1.fCharge,
-                                            3600,0,15000, Event.fPin1.fEcal);}
-// C
-  if(Event.fPin1.HasHit() && Event.fPin2.HasHit() && !Event.fSSSDLow.HasHit() && !Event.fSSSDHigh.HasHit()) {
-    GHistogramer::Get().Fill("PID/C_PID",3600,0,25000, Event.fI2SPin1.fCharge,
-                                            3600,0,15000, Event.fPin1.fEcal);}
-// D
-  if(Event.fPin1.HasHit() && Event.fPin2.HasHit() && Event.fDSSDHigh.HasHit() && !Event.fSSSDLow.HasHit() && !Event.fSSSDHigh.HasHit()) {
-    GHistogramer::Get().Fill("PID/D_PID",3600,0,25000, Event.fI2SPin1.fCharge,
-                                            3600,0,15000, Event.fPin1.fEcal);}
-// E
-  if(Event.fPin1.HasHit() && Event.fPin2.HasHit() && Event.fDSSDHigh.HasHit() && !Event.fSSSDLow.HasHit()) {
-    GHistogramer::Get().Fill("PID/E_PID",3600,0,25000, Event.fI2SPin1.fCharge,
-                                            3600,0,15000, Event.fPin1.fEcal);}
-
-
-// F - energy gate
 
 }  
 

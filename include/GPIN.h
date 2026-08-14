@@ -12,8 +12,8 @@ class GPIN {
   void Reset();
 
   bool HasHit();
-  bool Hit = false;
 
+ //private
   double fCharge;
   double fEcal;
   double Timestamp;

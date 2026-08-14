@@ -27,6 +27,8 @@
 #include <TTree.h>
 #include <TFile.h>
 
+#include <utils.h>
+
 
 void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrector* tofCorrector);
 
@@ -70,8 +72,10 @@ int main(int argc, char** argv) {
   if(inputFiles.empty()) { printf("No EVT files supplied\n"); return 1; }
   std::sort(inputFiles.begin(), inputFiles.end());
 
-  std::string homedir = std::getenv("HOME");
-  GChannel::ReadDetmap(Form("%s/Sandbox/NaNesort/cals/detmapfix.tsv", homedir.c_str()));
+//  std::string homedir = std::getenv("HOME");
+
+  std::string PATH = programPath();
+  GChannel::ReadDetmap(Form("%s/../cals/detmapfix.tsv", PATH.c_str()));
 
   std::filesystem::path p(inputFiles.front());
   std::string stem = p.stem().string();

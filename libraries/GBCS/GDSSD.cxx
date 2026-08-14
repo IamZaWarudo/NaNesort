@@ -32,7 +32,7 @@ void GDSSD::Reset() {
 }
 
 void GDSSD::UnpackFront(const ddasHit& hit) {   
- if (hit.GetEcal() >= 18000 ) return;
+// if (hit.GetEcal() >= 18000 ) return;
 
   fId = hit.GetId();
   frontTimestamp = hit.GetTimestamp();
@@ -55,7 +55,7 @@ void GDSSD::UnpackFront(const ddasHit& hit) {
 }
 
 void GDSSD::UnpackBack(const ddasHit& hit) {   
- if (hit.GetEcal() >= 18000 ) return;
+// if (hit.GetEcal() >= 18000 ) return;
 
   fId = hit.GetId();
   backTimestamp = hit.GetTimestamp();
@@ -85,12 +85,6 @@ bool GDSSD::HasGoodPosition() {
     GoodY = false;
     return false;
   }
-
- // if (std::abs(fxMult - fyMult) > 2) {
- //   GoodX = false;
- //   GoodY = false;
- //   return false;
- // }
 
 
   if (fxE > 0){

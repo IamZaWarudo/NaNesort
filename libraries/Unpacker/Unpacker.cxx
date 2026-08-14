@@ -45,7 +45,7 @@ for(const auto &hit : event) {
        fDSSDLow.UnpackBack(hit);
         break;
       case 160 ... 175:  // SSSD High Gain strips
-       fSSSDHigh.Unpack(hit);
+       fSSSDHigh.Unpack(hit,hit.GetId()-160);
         break;
       case 176:
 //     fI2N.Unpack(hit);        // Pin1 - I2N
@@ -68,7 +68,7 @@ for(const auto &hit : event) {
       case 183:
     // fPin3.Get(hit);    
       case 192 ... 207:  // SSSD Low Gain strips
-       fSSSDLow.Unpack(hit);
+       fSSSDLow.Unpack(hit,hit.GetId()-192);
        break;
       case 208 ... 223:
      //  fLaBr.Get(hit.GetId() - 208, hit);  // LaBr Crystals

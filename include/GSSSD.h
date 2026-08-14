@@ -9,7 +9,7 @@ class GSSSD {
   GSSSD();
   ~GSSSD();
  
-  void Unpack(const ddasHit& hit);
+  void Unpack(const ddasHit& hit,int id);
   void Reset();
 
 //  private:

@@ -220,22 +220,34 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
   double tof = Event.fI2SPin1.fCharge; 
 
   double dtPin = Event.fPin1.fTimestamp - Event.fPin2.fTimestamp;
+  
+  if(!hasPin) return;
 
   GHistogramer::Get().Fill("Pin_dt",1000,-500,500,dtPin);
 
-  if(!hasPin) return;
-
   for(int i=0;i<Event.fSSSDLow.fStripTime.size();i++) {
+    if(Event.fSSSDLow.fStripTime.size() != Event.fSSSDLow.fStrips.size()) {
+      printf(RED);
+      printf("\ttime  = %lu\n",Event.fSSSDLow.fStripTime.size());
+      printf("\tstips = %lu\n",Event.fSSSDLow.fStrips.size());
+      printf(RESET_COLOR);
+      printf("\n\n");
+    }
+
     double dt = Event.fPin1.fTimestamp - Event.fSSSDLow.fStripTime.at(i); 
-    GHistogramer::Get().Fill("sssd_dt", 1000,-500,500,dt);
-                                        //20,0,20,Event.fSSSDLow.fStrips.at(i));
+    GHistogramer::Get().Fill("sssd_dt", 1000,-500,500,dt,
+                                        20,0,20,Event.fSSSDLow.fStrips.at(i));
+  
+    GHistogramer::Get().Fill("sssd_dt_dE", 1000,-500,500,dt,
+                                           3600,0,25000,Event.fSSSDLow.fEcal.at(i));
   }
 
   GHistogramer::Get().Fill("PID/PID_Total",3600,0,25000, tof,
                                            3600,0,15000, dE);
 
   for(auto &e : Event.fSSSDLow.fEcal)
-    GHistogramer::Get().Fill("PID/PID_SSSDL_tof", 3600,0,25000, tof,                                3600,0,25000, e);
+    GHistogramer::Get().Fill("PID/PID_SSSDL_tof", 3600,0,25000, tof,
+                                                  3600,0,25000, e);
 
   if(!hasSSSDL)
     GHistogramer::Get().Fill("PID/PID_nSSSDL",3600,0,25000, tof,

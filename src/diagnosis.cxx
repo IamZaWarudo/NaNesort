@@ -227,7 +227,8 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
 
   for(int i=0;i<Event.fSSSDLow.fStripTime.size();i++) {
     double dt = Event.fPin1.fTimestamp - Event.fSSSDLow.fStripTime.at(i); 
-    GHistogramer::Get().Fill("sssd_dt", 1000,-500,500,dt,20,0,20,Event.fSSSDLow.fStrips.at(i));
+    GHistogramer::Get().Fill("sssd_dt", 1000,-500,500,dt);
+                                        //20,0,20,Event.fSSSDLow.fStrips.at(i));
   }
 
   GHistogramer::Get().Fill("PID/PID_Total",3600,0,25000, tof,

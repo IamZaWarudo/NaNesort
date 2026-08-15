@@ -23,11 +23,6 @@ void GSSSD::Unpack(const ddasHit& hit,int Id) {
   fEcal.push_back(hit.GetEcal());
   fStrips.push_back(Id);
 
-  //if(Id >= 160 && Id <= 175){
-  //  fStrips.push_back(Id -160);
-  //}else if(Id >= 192 && Id <=207){
-  //  fStrips.push_back(Id -192);
-  //}  
 }
 
 bool GSSSD::HasHit(){ 

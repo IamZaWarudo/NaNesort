@@ -19,8 +19,8 @@ class GBCS {
   void Reset();
 
 
-  GDSSD DSSDLow;
-  GDSSD DSSDHigh;
+  //GDSSD DSSDLow;
+  GDSSD DSSD;
 
   GPIN Pin1;
   GPIN Pin2;
@@ -30,8 +30,9 @@ class GBCS {
   GSSSD SSSDLow;
   GSSSD SSSDHigh;
 
-  void Fill(const Unpacker& Event);
   int EventType();
+
+  void Fill(const Unpacker& Event);
 
 };
 

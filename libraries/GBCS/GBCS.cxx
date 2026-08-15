@@ -13,8 +13,8 @@ GBCS::GBCS() { }
 
 void GBCS::Reset() {
 
- DSSDLow.Reset();
- DSSDHigh.Reset();
+ // DSSDLow.Reset();  // Not using this - unreliable
+ DSSD.Reset();
 
  Pin1.Reset();
  Pin2.Reset();
@@ -25,11 +25,13 @@ void GBCS::Reset() {
 }
 
 
+// fDSSDHigh filled in DSSD because we are going to use High only
+
 void GBCS::Fill(const Unpacker& Event) {
   
 
- DSSDLow = Event.fDSSDLow;
- DSSDHigh = Event.fDSSDHigh;
+ // DSSDLow = Event.fDSSDLow;
+ DSSD = Event.fDSSDHigh;
 
  Pin1 = Event.fPin1;
  Pin2 = Event.fPin2;
@@ -53,98 +55,42 @@ LightIon ----> 3
 Undentified -> 4
 *****************/
 
-int GBCS::EventType(){
-
- int condition = 123456789;
-
-//signal flags
- bool DSSDLowHasGoodPosition = false;
- bool DSSDHighHasGoodPosition = false;
  
- bool Pin1HasHit = false;
- bool Pin2HasHit = false;
+int GBCS::EventType() {
 
- bool SSSDLowHasHit = false;
- bool SSSDHighHasHit = false;
-
- bool HasToF = false;
-
- bool HasClover = false;
- bool HasLaBr = false;
+int condition = 0101010;
 
 
-//event identification
- bool IsImplant = false;        // 1
- bool IsDecay = false;          // 2
- bool IsLightIon = false;       // 3  
- bool IsUnidentified = false;   // 4
+bool hasPin      = false;
+bool hasDSSD     = false;
+bool hasDSSDGood = false;
+bool hasSSSDL    = false;
+bool hasSSSDH    = false;
+
+bool implant  = false;
+bool veto     = false;
+bool lightion = false;
 
 
-// add ifs here
- 
-  if(DSSDLow.HasGoodPosition()){
-   DSSDLowHasGoodPosition = true;
-  }
-  
-  if(DSSDHigh.HasGoodPosition()){
-   DSSDHighHasGoodPosition = true;
-  }
 
-  if(Pin1.HasHit()){
-    Pin1HasHit = true;
-  }
-  
-  if(Pin2.HasHit()){
-    Pin2HasHit = true;
-  }
-
-  if(I2SPin1.HasHit() && Pin1.HasHit()){
-    HasToF = true;
-  }
-
-  if(SSSDLow.HasHit()){
-    SSSDLowHasHit = true;
-  }
-  
-  if(SSSDHigh.HasHit()){
-    SSSDHighHasHit = true;
-  }
-
-
-if(HasToF && Pin1HasHit && Pin2HasHit && DSSDLowHasGoodPosition && !SSSDLowHasHit && !SSSDHighHasHit){
- IsImplant = true;
- condition = 1;
-} else
-if(!Pin1HasHit && !Pin2HasHit && !DSSDLowHasGoodPosition && DSSDHighHasGoodPosition && !SSSDLowHasHit && !SSSDHighHasHit){
- IsDecay = true;
- condition = 2;
-} else
-if(Pin1HasHit && Pin2HasHit && !DSSDLowHasGoodPosition && DSSDHighHasGoodPosition && !SSSDLowHasHit && SSSDHighHasHit){
- IsLightIon = true;
- condition = 3;
-}
-
-if(!IsImplant && !IsDecay && !IsLightIon) { 
- IsUnidentified = true;
- condition = 4;
+double dtPin = Pin1.fTimestamp - Pin2.fTimestamp;
+if(Pin1.HasHit() && Pin2.HasHit() && dtPin > 5 && dtPin < 11) {
+  hasPin = true;
 }
 
 
-// PID Diagnostic 
+if(DSSD.HasHit()){
+  hasDSSD = true;
+}
 
-// Detectors : PIN1 PIN2 DSSDHigh SSSDLow SSSDHigh     (DSSDLow = unreliable)
+if(hasDSSD == true && DSSD.HasGoodPosition()){
+  hasDSSDGood = true;
+}
 
-// noise 
-if(Pin1HasHit && Pin2HasHit && !DSSDHighHasGoodPosition && !SSSDLowHasHit && !SSSDHighHasHit) {
-  condition = 5;}
+if(SSSDLow.HasHit()) {
+ hasSSSDL = true;
+}
 
-// possible implants
-if(Pin1HasHit && Pin2HasHit && DSSDHighHasGoodPosition && !SSSDLowHasHit && !SSSDHighHasHit) {
-  condition = 6;}
-
-// possible light ions
-if(Pin1HasHit && Pin2HasHit && DSSDHighHasGoodPosition && !SSSDLowHasHit && SSSDHighHasHit) {
-  condition = 7;}
 
   return condition;
 }

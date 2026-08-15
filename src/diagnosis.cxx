@@ -264,8 +264,6 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
   if(hasDSSDGood && !hasSSSDL)
     GHistogramer::Get().Fill("PID/PID_DSSDGood_nSSSDL",3600,0,25000, tof,
                                                3600,0,15000, dE);
-
-  
-
+ // printf("%f\n", Event.fDSSDHigh.fTimestamp);
 }  
 

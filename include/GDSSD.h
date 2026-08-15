@@ -32,6 +32,8 @@ class GDSSD {
   bool    FrontHit;
   bool    BackHit;
 
+  double  fTimestamp;
+
   double  fxEsum;     
   double  fxE;        
   double  fxMaxE;     

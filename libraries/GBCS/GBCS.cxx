@@ -91,6 +91,16 @@ if(SSSDLow.HasHit()) {
  hasSSSDL = true;
 }
 
+if(SSSDHigh.HasHit()){
+ hasSSSDH = true;
+}
+
+
+if(!hasPin && hasDSSD & !hasSSSDL){
+  implant = true;
+}
+
+
 
   return condition;
 }

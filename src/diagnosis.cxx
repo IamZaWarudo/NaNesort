@@ -49,7 +49,6 @@ int main(int argc, char** argv) {
   if(argc < 2) { printf("usage: PrintCheck file.evt [file.evt ...]\n"); return 1; }
 
   std::vector<std::string> inputFiles;
-  std::string correctionFile;
 
   for(int i = 1; i < argc; ++i) {
     std::filesystem::path argument(argv[i]);
@@ -57,13 +56,7 @@ int main(int argc, char** argv) {
 
     if(extension == ".evt") {
       inputFiles.push_back(argument.string());
-    } else if(extension == ".tof") {
-      if(!correctionFile.empty()) {
-        printf("Only one .tof file may be supplied\n");
-        return 1;
-      }
-      correctionFile = argument.string();
-    } else {
+    }else {
       printf("Unsupported input file: %s\n", argv[i]);
       return 1;
     }
@@ -86,20 +79,18 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  gSystem->mkdir("diagn", true);
-  std::string ofile;
-  if(correctionFile.empty())
-    ofile = Form("diagn/diag%04d.root", run);
-  else
-    ofile = Form("diagn/diagCorr%04d.root", run);
-
-  GHistogramer::Get().SetOutFile(ofile);
-
-  std::unique_ptr<TOFCorrector> tofCorrector;
-  if(!correctionFile.empty()) {
-    printf("Loading TOF correction: %s\n", correctionFile.c_str());
-    tofCorrector = std::make_unique<TOFCorrector>(correctionFile);
+  std::string correctionFile = Form("%s/../tof/tof%04d.tof", PATH.c_str(), run);
+  if(!std::filesystem::exists(correctionFile)) {
+    printf("No TOF correction file found for run %d: %s\n", run, correctionFile.c_str());
+    return 1;
   }
+  
+  gSystem->mkdir("diagn", true);
+  std::string ofile = Form("diagn/diagCorr%04d.root", run);
+  GHistogramer::Get().SetOutFile(ofile);
+  
+  printf("Loading TOF correction: %s\n", correctionFile.c_str());
+  auto tofCorrector = std::make_unique<TOFCorrector>(correctionFile);
 
   evtLoop  reader(inputFiles, 500000, true);
   ddasLoop converter(reader, 200, 1);
@@ -217,7 +208,10 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
   bool hasSSSDH    = Event.fSSSDHigh.HasHit();
 
   double dE  = Event.fPin1.fEcal;
-  double tof = Event.fI2SPin1.fCharge; 
+  double rawtof = Event.fI2SPin1.fCharge; 
+  double runtime = Event.fPin1.fTimestamp / 1.e8 ;
+  double tof = tofCorrector->Correct(rawtof,runtime);
+
 
   double dtPin = Event.fPin1.fTimestamp - Event.fPin2.fTimestamp;
   
@@ -242,13 +236,13 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
                                            3600,0,25000,Event.fSSSDLow.fEcal.at(i));
   }
 
-  GHistogramer::Get().Fill("PID/PID_Total",3600,0,25000, tof,
-                                           3600,0,15000, dE);
-
   for(auto &e : Event.fSSSDLow.fEcal)
-    GHistogramer::Get().Fill("PID/PID_SSSDL_tof", 3600,0,25000, tof,
+    GHistogramer::Get().Fill("PID/PID_SSSDL_tof", 3600,0,25000, rawtof,
                                                   3600,0,25000, e);
 
+  GHistogramer::Get().Fill("PID/PID_Total",3600,0,25000, tof,
+                                           3600,0,15000, dE);
+  
   if(!hasSSSDL)
     GHistogramer::Get().Fill("PID/PID_nSSSDL",3600,0,25000, tof,
                                               3600,0,15000, dE);
@@ -264,6 +258,7 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
   if(hasDSSDGood && !hasSSSDL)
     GHistogramer::Get().Fill("PID/PID_DSSDGood_nSSSDL",3600,0,25000, tof,
                                                3600,0,15000, dE);
- // printf("%f\n", Event.fDSSDHigh.fTimestamp);
+
+ // printf("%f\n", Event.fDSSDHigh.fTimestampi);
 }  
 

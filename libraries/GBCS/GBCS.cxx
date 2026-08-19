@@ -48,9 +48,9 @@ void GBCS::Fill(const Unpacker& Event) {
 /****************
 Implant -----> 1
 *****************
-decay -------> 2
+Decay -------> 2
 *****************
-LightIon ----> 3
+Veto ----> 3
 *****************
 Undentified -> 4
 *****************/
@@ -69,6 +69,7 @@ bool hasSSSDH    = false;
 
 bool implant  = false;
 bool veto     = false;
+bool decay    = false;
 bool lightion = false;
 
 
@@ -96,10 +97,25 @@ if(SSSDHigh.HasHit()){
 }
 
 
-if(!hasPin && hasDSSD & !hasSSSDL){
+if(hasPin && hasDSSDGood & !hasSSSDL){
   implant = true;
+  condition = 1;
 }
 
+if(!hasPin && hasDSSDGood && !hasSSSDL){
+  decay = true;
+  condition = 2;
+}
+
+if(hasPin && hasDSSD && hasSSSDL && hasSSSDH){
+  veto = true;
+  condition = 3;
+}
+
+/*
+if(hasDSSD && hasSSSDH){
+  lightion = true;
+} */
 
 
   return condition;

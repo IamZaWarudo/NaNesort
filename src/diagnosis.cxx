@@ -243,21 +243,20 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
   GHistogramer::Get().Fill("PID/PID_Total",3600,0,25000, tof,
                                            3600,0,15000, dE);
   
-  if(!hasSSSDL)
-    GHistogramer::Get().Fill("PID/PID_nSSSDL",3600,0,25000, tof,
-                                              3600,0,15000, dE);
-  if(hasDSSD)
-    GHistogramer::Get().Fill("PID/PID_DSSD",3600,0,25000, tof,
-                                            3600,0,15000, dE);
-  if(hasDSSDGood)
-    GHistogramer::Get().Fill("PID/PID_DSSDGood",3600,0,25000, tof,
-                                               3600,0,15000, dE);
-  if(hasDSSD && !hasSSSDL)
-    GHistogramer::Get().Fill("PID/PID_DSSD_nSSSDL",3600,0,25000, tof,
-                                               3600,0,15000, dE);
-  if(hasDSSDGood && !hasSSSDL)
-    GHistogramer::Get().Fill("PID/PID_DSSDGood_nSSSDL",3600,0,25000, tof,
-                                               3600,0,15000, dE);
+  if(bcs.EventType() == 1){
+    GHistogramer::Get().Fill("PID/PID_Implant",3600,0,25000, tof,
+                                              3600,0,15000, dE);} 
+
+  if(bcs.EventType() == 2){
+    GHistogramer::Get().Fill("PID/PID_Decay",3600,0,25000, tof,
+                                            3600,0,15000, dE);}
+  if(bcs.EventType() == 3){
+    GHistogramer::Get().Fill("PID/PID_Veto",3600,0,25000, tof,
+                                               3600,0,15000, dE);}
+  if(bcs.EventType() == 4){
+    GHistogramer::Get().Fill("PID/PID_Unidentified",3600,0,25000, tof,
+                                               3600,0,15000, dE);}
+
 
  // printf("%f\n", Event.fDSSDHigh.fTimestampi);
 }  

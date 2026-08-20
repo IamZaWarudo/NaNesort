@@ -183,6 +183,7 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vect
   Event.Unpack(event);
   bcs.Reset();
   bcs.Fill(Event);
+  bcs.Print();
   corr.AddEvent(bcs, Event);
 
   //FillHistograms(event);

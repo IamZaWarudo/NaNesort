@@ -11,10 +11,10 @@ void GDSSD::Reset() {
   fEcal      = 0;
   frontTimestamp  = 0;
   backTimestamp   = 0;
-  xpos       = 0;
-  ypos       = 0;
-  Xpos       = 0;
-  Ypos       = 0;
+  xpos       = -1;
+  ypos       = -1;
+  Xpos       = -1;
+  Ypos       = -1;
   GoodX      = false;
   GoodY      = false;
 
@@ -53,13 +53,13 @@ void GDSSD::UnpackFront(const ddasHit& hit) {
 
   fxEsum += xpos * fEcal;
   fxE    += fEcal;
-  fxMult++;
 
   if(fEcal >= fxMaxE) {
     fxMaxE = fEcal;
     fxMaxStrip = xpos;}
 
   FrontHit = true;  
+  fxMult++;
 }
 
 void GDSSD::UnpackBack(const ddasHit& hit) {   

@@ -9,7 +9,7 @@
 #include <GSSSD.h>
 #include <GLaBr.h>
 #include <GClover.h>
-
+#include <GCloverHit.h>
 
 /****************
 Implant -----> 1
@@ -31,8 +31,18 @@ class GBCS {
 
 
   //GDSSD DSSDLow;
-  GDSSD DSSD;  // this DSSD is High Gain since the low gain seemed to be acting weird
 
+  double Timestamp() const { return DSSD.fTimestamp; }
+  double TOF() const { return I2SPin1.fEcal>0 ? I2SPin1.fEcal : -1; } 
+  int    X()   const { return DSSD.Xpos; }
+  int    Y()   const { return DSSD.Ypos; }
+
+  void Print(int type=-1) const;
+  int EventType() const { return fEventType; }
+
+
+//private:
+  GDSSD DSSD;  // this DSSD is High Gain since the low gain seemed to be acting weird
   GPIN Pin1;
   GPIN Pin2;
   GPIN I2SPin1;
@@ -41,7 +51,9 @@ class GBCS {
   GSSSD SSSDLow;
   GSSSD SSSDHigh;
 
-  int EventType();
+  std::vector<GCloverHit> fCloverHits;
+
+  int fEventType;
 
   void Fill(const Unpacker& Event);
 

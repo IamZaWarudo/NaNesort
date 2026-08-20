@@ -26,6 +26,7 @@ struct GImplant {
   int    x;
   int    y;
   double energy;
+  double tof;
 };
 
 struct GDecay {
@@ -47,16 +48,19 @@ class GCorrelator {
   void Flush();
   void Print() const;
 
+
+  void FillHistograms(const GBCS& bcs,const std::vector<GImplant> corrImplants);
+
  private:
   void StoreImplant(const GImplant& imp);
-  void StoreDecay(const GDecay& dec);
+  void StoreDecay(const GBCS& dec);
 
   int  FinalizeDecays(double current_time);
   int  PruneImplants(double current_time);
-  void CorrelateOneDecay(const GDecay& dec);
+  void CorrelateOneDecay(const GBCS& dec);
 
   std::vector<GImplant> fImplantGrid[kGrid][kGrid];
-  std::deque<GDecay>    fPendingDecays;
+  std::deque<GBCS>    fPendingDecays;
 
   std::vector<double> fFwdCandidates;   // signed, dt > 0
   std::vector<double> fBwdCandidates;   // signed, dt < 0

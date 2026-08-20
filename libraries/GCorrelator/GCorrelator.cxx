@@ -17,6 +17,8 @@ GCorrelator::GCorrelator() {
 // ---------------------------------------------------------------
 // Called once per built event, from ProcessEvent.
 // ---------------------------------------------------------------
+//  type = 1 is implant
+//  type = 2 is decay
 void GCorrelator::AddEvent(GBCS& bcs, const Unpacker& evt) {
 
   // MUST come first. EventType() calls GDSSD::HasGoodPosition(), which is
@@ -30,40 +32,46 @@ void GCorrelator::AddEvent(GBCS& bcs, const Unpacker& evt) {
 
   if(x < 0 || x >= kGrid || y < 0 || y >= kGrid) return;
 
-  if(fLastTime > 0 && t < fLastTime) fOutOfOrder++;
-  fLastTime = t;
+  if(fLastTime > 0 && t < fLastTime) {
+    printf(RED "BAD THINGS ARE HAPPENING WITH TIME ORDERING!!  [%li]",fOutOfOrder);
+    printf(RESET_COLOR "\n\n");
+    fflush(stdout);
+    fOutOfOrder++;
+  }
+  fLastTime = t; // ?  last time is now set to the current time??
 
   // fxE = front-strip energy SUM. Not fEcal, which is overwritten by every
   // strip in UnpackFront/UnpackBack and holds whichever was unpacked last.
-  if(type == 1) {
+  if(type == 1) { // implant
 
     GImplant imp;
     imp.time   = t;
     imp.x      = x;
     imp.y      = y;
     imp.energy = bcs.DSSD.fxE;
+    imp.tof    = bcs.TOF();
 
-    StoreImplant(imp);
+    StoreImplant(imp);  
 
-  } else {
+  } else if(type==2) { //decay
 
-    GDecay dec;
-    dec.time   = t;
-    dec.x      = x;
-    dec.y      = y;
-    dec.energy = bcs.DSSD.fxE;
+    //GDecay dec;
+    //dec.time   = t;
+    //dec.x      = x;
+    //dec.y      = y;
+    //dec.energy = bcs.DSSD.fxE;
 
     // Captured NOW. This decay is not correlated until fBGWindow later, by
     // which point the Unpacker has been Reset() thousands of times over.
     // Reset() sets fEcal = 0, so 0 means "no clover hit this event" -- the
     // same test HasHit() makes, without needing a non-const call.
-    dec.gamma = evt.fCrystal.fEcal;
+    //dec.gamma = evt.fCrystal.fEcal;
 
-    StoreDecay(dec);
+    StoreDecay(bcs);
   }
 
-  fDecaysFinalized += FinalizeDecays(t);   // correlate first,
-  fImplantsErased  += PruneImplants(t);    // then discard
+  fDecaysFinalized += FinalizeDecays(t);   // correlate first, (currentTime)
+  fImplantsErased  += PruneImplants(t);    // then discard     (currentTime)
 }
 
 
@@ -75,7 +83,7 @@ void GCorrelator::StoreImplant(const GImplant& imp) {
   fImplantsStored++;
 }
 
-void GCorrelator::StoreDecay(const GDecay& dec) {
+void GCorrelator::StoreDecay(const GBCS& dec) {
   fPendingDecays.push_back(dec);
   fDecaysStored++;
 }
@@ -88,15 +96,15 @@ int GCorrelator::FinalizeDecays(double current_time) {
   int handled = 0;
 
   while(!fPendingDecays.empty()) {
-    const GDecay& dec = fPendingDecays.front();
+    const GBCS& dec = fPendingDecays.front();
 
-    double waited = (current_time - dec.time) / kTicksPerMs;
+    double waited = (current_time - dec.DSSD.fTimestamp) / kTicksPerMs;
 
     // break, NOT continue: the deque is time-ordered, so if the front is
     // not ripe then nothing behind it is either.
-    if(waited < fBGWindow) break;
+    if(waited < fBGWindow) break;  
 
-    CorrelateOneDecay(dec);
+    CorrelateOneDecay(dec);   ///???
     fPendingDecays.pop_front();
     handled++;
   }
@@ -107,36 +115,43 @@ int GCorrelator::FinalizeDecays(double current_time) {
 // ---------------------------------------------------------------
 // The one search. 3x3 pixels, both signs of dt, one pass.
 // ---------------------------------------------------------------
-void GCorrelator::CorrelateOneDecay(const GDecay& dec) {
+void GCorrelator::CorrelateOneDecay(const GBCS& dec) {
 
-  const int R = fSearchRadius;
+  //const int R = fSearchRadius;// 3?
+  const int R = 1;
 
   fFwdCandidates.clear();
   fBwdCandidates.clear();
 
+  std::vector<GImplant> corrImplants;
+
   // ---------- gather ----------
-  for(int ix = std::max(0, dec.x - R); ix <= std::min(kGrid-1, dec.x + R); ++ix) {
-    for(int iy = std::max(0, dec.y - R); iy <= std::min(kGrid-1, dec.y + R); ++iy) {
+  for(int ix = std::max(0, dec.X() - R); ix <= std::min(kGrid-1, dec.X() + R); ++ix) {
+    for(int iy = std::max(0, dec.Y() - R); iy <= std::min(kGrid-1, dec.Y() + R); ++iy) {
 
       for(const auto& imp : fImplantGrid[ix][iy]) {
 
         // ALWAYS decay - implant. Never flip this sign anywhere.
-        double dt = (dec.time - imp.time) / kTicksPerMs;
+        double dt = (dec.DSSD.fTimestamp - imp.time) / kTicksPerMs;
 
         if(dt < -fBGWindow)    continue;      // implant too far AFTER the decay
         if(dt >  fDecayWindow) continue;      // implant too far BEFORE the decay
 
-        GHistogramer::Get().Fill("corr/dt_allpairs", kDtBins, kDtMin, kDtMax, dt);
+        //GHistogramer::Get().Fill("corr/dt_allpairs", kDtBins, kDtMin, kDtMax, dt);
 
+        corrImplants.push_back(imp);
         if(dt > 0) fFwdCandidates.push_back(dt);
         else       fBwdCandidates.push_back(dt);   // stays negative
       }
     }
   }
 
-  GHistogramer::Get().Fill("corr/ncand_fwd", 20, 0.0, 20.0,
-                           (double)fFwdCandidates.size());
+  FillHistograms(dec,corrImplants);
 
+
+  //GHistogramer::Get().Fill("corr/ncand_fwd", 20, 0.0, 20.0,
+  //                         (double)fFwdCandidates.size());
+/*
   // ---------- forward: signal + background ----------
   if(fFwdCandidates.size() == 1) {
     fFwdAccepted++;
@@ -172,6 +187,7 @@ void GCorrelator::CorrelateOneDecay(const GDecay& dec) {
   } else {
     fBwdEmpty++;
   }
+*/
 }
 
 
@@ -183,9 +199,8 @@ int GCorrelator::PruneImplants(double current_time) {
   // The SUM of both windows. Either alone silently deletes implants that a
   // still-pending decay could have matched. Windows are ms, current_time is
   // ticks -> multiply here (CorrelateOneDecay divides; opposite direction).
-  const double tmin_keep =
-      current_time - (fBGWindow + fDecayWindow) * kTicksPerMs;
-
+  const double tmin_keep = current_time - (fBGWindow + fDecayWindow) * kTicksPerMs;
+                                           //1 sec      //5 sec  
   int erased = 0;
 
   for(int x = 0; x < kGrid; ++x) {
@@ -236,3 +251,16 @@ void GCorrelator::Print() const {
 
   printf("\n");
 }
+
+
+
+void GCorrelator::FillHistograms(const GBCS& bcs,const std::vector<GImplant> corrImplants) {
+  //printf("BCS [%02i][%02i] @ %.1f\n",bcs.X(),bcs.Y(),bcs.Timestamp()); 
+  for( auto &implant : corrImplants) {
+    double dtime = (bcs.Timestamp() - implant.time) / kTicksPerMs;
+    //printf("\t[%02i][%02i] - %.1f\n",implant.x,implant.y,dtime);
+  }
+  //printf("\n");
+}
+
+

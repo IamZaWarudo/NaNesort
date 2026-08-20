@@ -25,6 +25,7 @@ void Unpacker::Reset() {
 
   fLaBr.Reset();
   fCrystal.Reset();
+  fCloverHits.clear();
 }
 
 // for reference case 0 is strip 1
@@ -75,7 +76,12 @@ for(const auto &hit : event) {
      //  fLaBr.Get(hit.GetId() - 208, hit);  // LaBr Crystals
         break;
       case 224 ... 287:  // 16 Clover x 4 crystals
-       fCrystal.Unpack(hit,hit.GetId() - 224);
+        {
+        GCloverHit xtal;
+        xtal.Unpack(hit,hit.GetId() -224);
+        fCloverHits.push_back(xtal);
+       //fCrystal.Unpack(hit,hit.GetId() - 224);
+        }
         break;
 
       default:

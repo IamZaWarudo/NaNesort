@@ -4,11 +4,17 @@
 #pragma link C++ class GSSSD+;
 #pragma link C++ class GDSSD+;
 #pragma link C++ class GPIN+;
-#pragma link C++ class GBCS+;
 #pragma link C++ class GPixel+;
 
 #pragma link C++ class TOFCorrector+;
+
+#pragma link C++ class GCloverHit+;
+#pragma link C++ class std::vector<GCloverHit>+;
+
 #pragma link C++ class GClover+;
 #pragma link C++ class GLaBr+;
+
+
+#pragma link C++ class GBCS+;
 
 #endif

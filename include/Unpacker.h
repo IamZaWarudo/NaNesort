@@ -9,7 +9,7 @@
 #include <GSSSD.h>
 #include <GLaBr.h>
 #include <GClover.h>
-
+#include <GCloverHit.h>
 
 class Unpacker {
  public:
@@ -36,6 +36,8 @@ class Unpacker {
 
   GLaBr fLaBr;
   GClover fCrystal;
+
+  std::vector<GCloverHit> fCloverHits;
 
 };
 

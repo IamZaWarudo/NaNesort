@@ -194,7 +194,7 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vect
         300,   0, 300,   hit.GetId());
     GHistogramer::Get().Fill("All_Channel/raw",  10000, 0, 32000, hit.GetCharge(),
         300,   0, 300,   hit.GetId());
-}
+  }
 
 
 
@@ -226,6 +226,7 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vect
 
 
   // (3) SSSD low vs high, paired by strip within the event
+  if(isImplant) {
   for(size_t i = 0; i < Event.fSSSDLow.fStrips.size(); ++i) {
     int    sL = Event.fSSSDLow.fStrips.at(i);
     double eL = Event.fSSSDLow.fEcal.at(i);
@@ -237,6 +238,7 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vect
                                                 4000, 0, 40000,
                                                 Event.fSSSDHigh.fEcal.at(j));
     }
+  }
   }
 
   for(int s : Event.fSSSDLow.fStrips)

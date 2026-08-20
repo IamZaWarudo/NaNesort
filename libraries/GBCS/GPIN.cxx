@@ -5,9 +5,9 @@ GPIN::GPIN() { Reset();  }
 GPIN::~GPIN() {}
 
 void GPIN::Reset() {
-  fEcal      = 0;
+  fEcal       = 0;
   fTimestamp  = 0;
-  fCharge    = 0;
+  fCharge     = 0;
 }
 
 void GPIN::Unpack(const ddasHit& hit) {   

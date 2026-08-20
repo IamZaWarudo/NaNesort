@@ -205,9 +205,46 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vect
 
 
   double dtPin = Event.fPin1.fTimestamp - Event.fPin2.fTimestamp;
-  
-
   GHistogramer::Get().Fill("Pin_dt",1000,-500,500,dtPin);
+
+  bool beam = Event.fPin1.HasHit() && Event.fPin2.HasHit() && dtPin > 5 && dtPin < 11;
+
+  bool isImplant = (bcs.EventType() == 1);
+  bool isDecay   = (bcs.EventType() == 2);
+
+  if(beam)
+    for(double e : Event.fSSSDHigh.fEcal)
+      GHistogramer::Get().Fill("chk/sssdh_beam", 4000, 0.0, 32000.0, e);
+
+  if(isImplant)
+    for(double e : Event.fSSSDHigh.fEcal)
+      GHistogramer::Get().Fill("chk/sssdh_implant", 4000, 0.0, 32000.0, e);
+  
+  if(isDecay)
+    for(double e : Event.fSSSDHigh.fEcal)
+      GHistogramer::Get().Fill("chk/sssdh_decay", 4000, 0.0, 32000.0, e);
+
+
+  // (3) SSSD low vs high, paired by strip within the event
+  for(size_t i = 0; i < Event.fSSSDLow.fStrips.size(); ++i) {
+    int    sL = Event.fSSSDLow.fStrips.at(i);
+    double eL = Event.fSSSDLow.fEcal.at(i);
+
+    for(size_t j = 0; j < Event.fSSSDHigh.fStrips.size(); ++j) {
+      if(Event.fSSSDHigh.fStrips.at(j) != sL) continue;
+
+      GHistogramer::Get().Fill("chk/sssd_LvsH", 500, 0.0, 32000.0, eL,
+                                                500, 0.0, 32000.0,
+                                                Event.fSSSDHigh.fEcal.at(j));
+    }
+  }
+
+  for(int s : Event.fSSSDLow.fStrips)
+    GHistogramer::Get().Fill("chk/sssdl_strip", 30, -15.0, 15.0, (double)s);
+  for(int s : Event.fSSSDHigh.fStrips)
+    GHistogramer::Get().Fill("chk/sssdh_strip", 30, -15.0, 15.0, (double)s);
+
+
 
   for(int i=0;i<Event.fSSSDLow.fStripTime.size();i++) {
     if(Event.fSSSDLow.fStripTime.size() != Event.fSSSDLow.fStrips.size()) {

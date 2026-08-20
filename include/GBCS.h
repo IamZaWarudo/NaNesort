@@ -2,7 +2,6 @@
 #define __GBCS_H__
 
 #include <vector>
-#include <Unpacker.h>
 #include <ddasHit.h>
 #include <GPIN.h>
 #include <GDSSD.h>
@@ -10,16 +9,6 @@
 #include <GLaBr.h>
 #include <GClover.h>
 #include <GCloverHit.h>
-
-/****************
-Implant -----> 1
-*****************
-Decay -------> 2
-*****************
-Veto ----> 3
-*****************
-Undentified -> 4
-*****************/
 
 
 class GBCS {
@@ -32,30 +21,35 @@ class GBCS {
 
   //GDSSD DSSDLow;
 
-  double Timestamp() const { return DSSD.fTimestamp; }
-  double TOF() const { return I2SPin1.fEcal>0 ? I2SPin1.fEcal : -1; } 
-  int    X()   const { return DSSD.Xpos; }
-  int    Y()   const { return DSSD.Ypos; }
+  double Timestamp() const { return fDSSD.fTimestamp; }
+  double TOF() const { return fI2SPin1.fEcal>0 ? fI2SPin1.fEcal : -1; } 
+  int    X()   const { return fDSSD.Xpos; }
+  int    Y()   const { return fDSSD.Ypos; }
 
   void Print(int type=-1) const;
-  int EventType() const { return fEventType; }
+  int EventType() const;
 
 
 //private:
-  GDSSD DSSD;  // this DSSD is High Gain since the low gain seemed to be acting weird
-  GPIN Pin1;
-  GPIN Pin2;
-  GPIN I2SPin1;
-  GPIN I2SPin2;
+  
+  GDSSD fDSSD; // DSSD ->> is DSSD High Gain
+  GDSSD fDSSDLow;
 
-  GSSSD SSSDLow;
-  GSSSD SSSDHigh;
+  GPIN fPin1;
+  GPIN fPin2;
+  GPIN fI2TAC;
+  GPIN fI2SPin1;
+  GPIN fI2SPin2;
 
-  std::vector<GCloverHit> fCloverHits;
+  GSSSD fSSSDLow;
+  GSSSD fSSSDHigh;
+
+  GClover fCrystal;
+  std::vector<GClover> fCloverHits;
+
 
   int fEventType;
 
-  void Fill(const Unpacker& Event);
 
 };
 

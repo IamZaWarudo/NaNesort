@@ -233,8 +233,8 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vect
     for(size_t j = 0; j < Event.fSSSDHigh.fStrips.size(); ++j) {
       if(Event.fSSSDHigh.fStrips.at(j) != sL) continue;
 
-      GHistogramer::Get().Fill("chk/sssd_LvsH", 500, 0.0, 32000.0, eL,
-                                                500, 0.0, 32000.0,
+      GHistogramer::Get().Fill("chk/sssd_LvsH", 4000, 0, 40000, eL,
+                                                4000, 0, 40000,
                                                 Event.fSSSDHigh.fEcal.at(j));
     }
   }
@@ -263,9 +263,9 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vect
                                            3600,0,25000,Event.fSSSDLow.fEcal.at(i));
   }
 
-  for(auto &e : Event.fSSSDLow.fEcal)
+  for(auto &e : Event.fSSSDLow.fEcal) {
     GHistogramer::Get().Fill("PID/PID_SSSDL_tof", 3600,0,25000, rawtof,
-                                                  3600,0,25000, e);
+                                                  3600,0,25000, e); }
 
   GHistogramer::Get().Fill("PID/PID_Total",3600,0,25000, tof,
                                            3600,0,15000, dE);
@@ -293,8 +293,6 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vect
   int t = bcs.EventType();
   const char* cls = (t==1) ? "implant" : (t==2) ? "decay" : nullptr;
   if(cls) {
-    GHistogramer::Get().Fill(Form("chk/pos_%s",  cls), 40,0,40, bcs.DSSD.Xpos,
-                                                      40,0,40, bcs.DSSD.Ypos);
     GHistogramer::Get().Fill(Form("chk/e_%s",    cls), 4000,0,32000, bcs.DSSD.fxE);
     GHistogramer::Get().Fill(Form("chk/emax_%s", cls), 4000,0,32000, bcs.DSSD.fxMaxE);
     GHistogramer::Get().Fill(Form("chk/mult_%s", cls), 40,0,40, (double)bcs.DSSD.fxMult);

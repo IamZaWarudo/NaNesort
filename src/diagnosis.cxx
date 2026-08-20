@@ -240,9 +240,9 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vect
                                            3600,0,25000,Event.fSSSDLow.fEcal.at(i));
   }
 
-  for(auto &e : Event.fSSSDLow.fEcal)
+  for(auto &e : Event.fSSSDLow.fEcal) {
     GHistogramer::Get().Fill("PID/PID_SSSDL_tof", 3600,0,25000, rawtof,
-                                                  3600,0,25000, e);
+                                                  3600,0,25000, e); }
 
   GHistogramer::Get().Fill("PID/PID_Total",3600,0,25000, tof,
                                            3600,0,15000, dE);

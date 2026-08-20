@@ -58,7 +58,7 @@ Undentified -> 4
  
 int GBCS::EventType() {
 
-int condition = 0101010;
+int condition = 4;  // Unidentified
 
 
 bool hasPin      = false;

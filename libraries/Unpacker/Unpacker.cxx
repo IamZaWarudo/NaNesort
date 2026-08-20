@@ -67,6 +67,7 @@ for(const auto &hit : event) {
         break;
       case 183:
     // fPin3.Get(hit);    
+        break;
       case 192 ... 207:  // SSSD Low Gain strips
        fSSSDLow.Unpack(hit,hit.GetId()-192);
        break;
@@ -74,7 +75,7 @@ for(const auto &hit : event) {
      //  fLaBr.Get(hit.GetId() - 208, hit);  // LaBr Crystals
         break;
       case 224 ... 287:  // 16 Clover x 4 crystals
-     //  fCrystal.Get(hit.GetId() - 224, hit);
+       fCrystal.Unpack(hit,hit.GetId() - 224);
         break;
 
       default:

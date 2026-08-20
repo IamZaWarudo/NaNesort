@@ -23,14 +23,14 @@
 #include <globals.h>
 #include <PIDGates.h>
 #include <Unpacker.h>
-
+#include <GCorrelator.h>
 #include <TTree.h>
 #include <TFile.h>
 
 #include <utils.h>
 
 
-void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrector* tofCorrector);
+void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vector<ddasHit>& event, const TOFCorrector* tofCorrector);
 
 // Progress bar eta
 static std::string FormatDuration(double seconds) {
@@ -112,10 +112,11 @@ int main(int argc, char** argv) {
   Unpacker Event;
   std::vector<ddasHit> event;
   GBCS bcs;
+  GCorrelator corr;
 
   while(!converter.Finished() || !converter.Empty()) {
     if(converter.TryPop(event)) {
-      ProcessEvent(Event, bcs, event, tofCorrector.get());
+      ProcessEvent(Event, bcs, corr, event, tofCorrector.get());
       event.clear();
     }
 
@@ -171,15 +172,18 @@ int main(int argc, char** argv) {
 
   reader.Stop();
   converter.Stop();
+  corr.Flush();
+  corr.Print();
   GHistogramer::Get().Close();
   return 0;
 }
 
-void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event, const TOFCorrector* tofCorrector) {
+void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vector<ddasHit>& event, const TOFCorrector* tofCorrector) {
   Event.Reset();
   Event.Unpack(event);
   bcs.Reset();
   bcs.Fill(Event);
+  corr.AddEvent(bcs, Event);
 
   //FillHistograms(event);
   //FillHistograms(bcs);
@@ -242,18 +246,23 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, const std::vector<ddasHit>& event,
 
   GHistogramer::Get().Fill("PID/PID_Total",3600,0,25000, tof,
                                            3600,0,15000, dE);
-  
-  if(bcs.EventType() == 1){
+ 
+  if(bcs.EventType() == 1){  // Implant
     GHistogramer::Get().Fill("PID/PID_Implant",3600,0,25000, tof,
-                                              3600,0,15000, dE);} 
+                                              3600,0,15000, dE);
+    GHistogramer::Get().Fill("Position/DSSD_Implant", 40,0,40, bcs.DSSD.Xpos,
+                                                      40,0,40, bcs.DSSD.Ypos);} 
 
-  if(bcs.EventType() == 2){
+  if(bcs.EventType() == 2){  // Decay
     GHistogramer::Get().Fill("PID/PID_Decay",3600,0,25000, tof,
-                                            3600,0,15000, dE);}
-  if(bcs.EventType() == 3){
+                                            3600,0,15000, dE);
+    GHistogramer::Get().Fill("Position/DSSD_Decay", 40,0,40, bcs.DSSD.Xpos,
+                                                      40,0,40, bcs.DSSD.Ypos);}
+  
+  if(bcs.EventType() == 3){  // Veto
     GHistogramer::Get().Fill("PID/PID_Veto",3600,0,25000, tof,
                                                3600,0,15000, dE);}
-  if(bcs.EventType() == 4){
+  if(bcs.EventType() == 4){  // Unidentified
     GHistogramer::Get().Fill("PID/PID_Unidentified",3600,0,25000, tof,
                                                3600,0,15000, dE);}
 

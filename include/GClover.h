@@ -5,29 +5,22 @@
 #include <vector>
 
 
-class GCloverHit {
-  public:
-    int    fId     {-1};  // crystal 0-63 in hits, clover 0-15 in addbackHits
-    double fCharge {0};
-    double fEcal   {0};
-    double fTime   {-1};
-
- ClassDef(GCloverHit,1);
-};
-
-
 class GClover {
-  public:
+ public:
   GClover();
   ~GClover();
-  
-  void Get(int Crystal, const ddasHit& hit);
-  void Reset();
-  void BuildAddback();
 
-  std::vector<GCloverHit> hits;  
-  std::vector<GCloverHit> addbackHits;
-  
+  void Reset();
+  void Unpack(const ddasHit& hit, int id);
+
+  bool HasHit() const;
+ 
+
+  int    fId;
+  double fCharge;
+  double fEcal;
+  double fTimestamp;
+
  ClassDef(GClover,1);
 };
 

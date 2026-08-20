@@ -106,7 +106,8 @@ bool GDSSD::HasGoodPosition() {
     return false;
   }
 
-
+// Co-ord is the weighted average of the strip
+// position vevrified against the strip with the highest ecal.
   if (fxE > 0){
     Xpos = fxEsum / fxE;
     GoodX = fabs(Xpos - fxMaxStrip) <= 3;

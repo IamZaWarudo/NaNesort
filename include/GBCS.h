@@ -11,6 +11,17 @@
 #include <GClover.h>
 
 
+/****************
+Implant -----> 1
+*****************
+Decay -------> 2
+*****************
+Veto ----> 3
+*****************
+Undentified -> 4
+*****************/
+
+
 class GBCS {
  public:
   GBCS();
@@ -20,7 +31,7 @@ class GBCS {
 
 
   //GDSSD DSSDLow;
-  GDSSD DSSD;
+  GDSSD DSSD;  // this DSSD is High Gain since the low gain seemed to be acting weird
 
   GPIN Pin1;
   GPIN Pin2;

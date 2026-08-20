@@ -24,8 +24,10 @@ class GDSSD {
   double  backTimestamp;
   int     xpos;       
   int     ypos;       
-  int     Xpos;       
-  int     Ypos;       
+  
+  int     Xpos;  // final position     
+  int     Ypos;  // final position     
+  
   bool    GoodX;      
   bool    GoodY;      
  

@@ -273,12 +273,27 @@ void ProcessEvent(Unpacker& Event, GBCS& bcs, GCorrelator& corr, const std::vect
   if(bcs.EventType() == 1){  // Implant
     GHistogramer::Get().Fill("PID/PID_Implant",3600,0,25000, tof,
                                               3600,0,15000, dE);
+    
+    GHistogramer::Get().Fill("SSSD_Gamma/SSSD_Gamma_Implant", 4000,0,40000, Event.fSSSDHigh.fSum,
+                                                              4000,0,4000, Event.fCrystal.fEcal);
+
+    GHistogramer::Get().Fill("DSSD_Gamma/DSSD_Gamma_Implant", 4000,0,40000, Event.fDSSDHigh.fxE + Event.fDSSDHigh.fyE,
+                                                              4000,0,4000, Event.fCrystal.fEcal);
+
     GHistogramer::Get().Fill("Position/DSSD_Implant", 40,0,40, bcs.DSSD.Xpos,
                                                       40,0,40, bcs.DSSD.Ypos);} 
 
   if(bcs.EventType() == 2){  // Decay
     GHistogramer::Get().Fill("PID/PID_Decay",3600,0,25000, tof,
                                             3600,0,15000, dE);
+    
+    GHistogramer::Get().Fill("SSSD_Gamma/SSSD_Gamma_Decay", 4000,0,40000, Event.fSSSDHigh.fSum,
+                                                              4000,0,4000, Event.fCrystal.fEcal);
+
+
+    GHistogramer::Get().Fill("DSSD_Gamma/DSSD_Gamma_Decay", 4000,0,40000, Event.fDSSDHigh.fxE + Event.fDSSDHigh.fyE,
+                                                              4000,0,4000, Event.fCrystal.fEcal);
+
     GHistogramer::Get().Fill("Position/DSSD_Decay", 40,0,40, bcs.DSSD.Xpos,
                                                       40,0,40, bcs.DSSD.Ypos);}
   

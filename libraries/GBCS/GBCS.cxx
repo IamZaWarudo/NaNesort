@@ -60,7 +60,7 @@ int GBCS::EventType() {
 
 int condition = 4;  // Unidentified
 
-
+bool hasTOF       = false;
 bool hasPin      = false;
 bool hasDSSD     = false;
 bool hasDSSDGood = false;
@@ -77,6 +77,10 @@ bool lightion = false;
 double dtPin = Pin1.fTimestamp - Pin2.fTimestamp;
 if(Pin1.HasHit() && Pin2.HasHit() && dtPin > 5 && dtPin < 11) {
   hasPin = true;
+}
+
+if(hasPin && I2SPin1.HasHit()){
+ hasTOF = true;
 }
 
 
@@ -96,26 +100,34 @@ if(SSSDHigh.HasHit()){
  hasSSSDH = true;
 }
 
+if(SSSDHigh.fSum > 2600 ){
+  lightion = true;
+}
 
-if(hasPin && hasDSSDGood & !hasSSSDL){
+if(hasPin && Pin1.fCharge < 3500) {
+  lightion = true;
+}
+
+
+// This needs to also have a TOF condition 
+
+
+if(hasPin && hasTOF && hasDSSDGood && !hasSSSDL && !lightion){
   implant = true;
   condition = 1;
 }
 
-if(!hasPin && hasDSSDGood && !hasSSSDL){
+if(!hasPin && !hasTOF && hasDSSDGood && !hasSSSDL && !lightion){
   decay = true;
   condition = 2;
 }
 
-if(hasPin && hasDSSD && hasSSSDL && hasSSSDH){
+if(hasPin && hasDSSD && hasSSSDL){
   veto = true;
   condition = 3;
 }
 
-/*
-if(hasDSSD && hasSSSDH){
-  lightion = true;
-} */
+
 
 
   return condition;

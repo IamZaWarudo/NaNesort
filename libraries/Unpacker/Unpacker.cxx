@@ -13,13 +13,9 @@ Unpacker::~Unpacker() {}
 
 
 
-void Unpacker::Unpack() {
+void Unpacker::Unpack(GBCS& bcs, std::vector<ddasHit>& hits) {
 
-
-GBCS bcs;
 bcs.Reset();
-std::vector<ddasHit> hits;
-
 
 for(const auto &hit : hits) {
   switch(hit.GetId()) {

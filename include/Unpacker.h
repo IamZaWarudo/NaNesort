@@ -11,7 +11,7 @@ class Unpacker {
   Unpacker();
   ~Unpacker();
 
-  void Unpack();
+  void Unpack(GBCS& bcs, std::vector<ddasHit>& hits);
 
 };
 

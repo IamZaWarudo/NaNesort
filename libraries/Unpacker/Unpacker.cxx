@@ -62,8 +62,8 @@ for(const auto &hit : hits) {
      //  fLaBr.Get(hit.GetId() - 208, hit);  // LaBr Crystals
         break;
       case 224 ... 287:  // 16 Clover x 4 crystals
-       bcs.fCrystal.Unpack(hit, hit.GetId() - 224);
-       bcs.fCloverHits.push_back(bcs.fCrystal);
+       bcs.fClover.Unpack(hit);
+       bcs.fClover.fCloverHits.push_back(hit);
        
         //bcs.GCloverHit xtal;
         //xtal.Unpack(hit,hit.GetId() -224);

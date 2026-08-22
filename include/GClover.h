@@ -10,11 +10,13 @@ class GClover {
   GClover();
   ~GClover();
 
-  void Reset();
-  void Unpack(const ddasHit& hit, int id);
+  std::vector<ddasHit> fCloverHits;
 
+  void Reset();
+  void Unpack(const ddasHit& hit);
   bool HasHit() const;
  
+  void AddBack();
 
   int    fId;
   double fCharge;

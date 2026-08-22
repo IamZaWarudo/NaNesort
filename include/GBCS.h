@@ -8,7 +8,6 @@
 #include <GSSSD.h>
 #include <GLaBr.h>
 #include <GClover.h>
-#include <GCloverHit.h>
 
 
 class GBCS {
@@ -21,12 +20,12 @@ class GBCS {
 
   //GDSSD DSSDLow;
 
-  double Timestamp() const { return fDSSD.fTimestamp; }
-  double TOF() const { return fI2SPin1.fEcal>0 ? fI2SPin1.fEcal : -1; } 
-  int    X()   const { return fDSSD.Xpos; }
-  int    Y()   const { return fDSSD.Ypos; }
-
-  void Print(int type=-1) const;
+//  double Timestamp() const { return fDSSD.fTimestamp; }
+//  double TOF() const { return fI2SPin1.fEcal>0 ? fI2SPin1.fEcal : -1; } 
+//  int    X()   const { return fDSSD.Xpos; }
+//  int    Y()   const { return fDSSD.Ypos; }
+//
+//  void Print(int type=-1) const;
   int EventType() const;
 
 
@@ -44,9 +43,8 @@ class GBCS {
   GSSSD fSSSDLow;
   GSSSD fSSSDHigh;
 
-  GClover fCrystal;
-  std::vector<GClover> fCloverHits;
-
+  GClover fClover;
+ 
 
   int fEventType;
 

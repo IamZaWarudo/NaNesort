@@ -9,11 +9,12 @@ void GClover::Reset() {
   fEcal      = 0;
   fTimestamp = 0;
   fCharge    = 0;
+  fCloverHits.clear();
 }
 
-void GClover::Unpack(const ddasHit& hit, int id) {
+void GClover::Unpack(const ddasHit& hit) {
 
-  fId = id;
+  fId = hit.GetId() - 224;
   fCharge = hit.GetCharge();
   fTimestamp = hit.GetTimestamp();
   fEcal = hit.GetEcal();
@@ -25,4 +26,14 @@ bool GClover::HasHit() const{
   return false;
 }
 
+void GClover::AddBack(){
 
+
+ for(const auto& c : fCloverHits){
+   
+   // Do Something
+ 
+ }
+
+
+}

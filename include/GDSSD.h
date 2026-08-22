@@ -13,40 +13,42 @@ class GDSSD {
   
   void Reset();
 
-  bool HasHit();
-  bool HasGoodPosition();
+  bool HasPosition();
 
 //  private:
-
-  int     fId;
-  double  fEcal;      
-  double  frontTimestamp;
-  double  backTimestamp;
-  int     xpos;       
-  int     ypos;       
-  
-  int     Xpos;  // final position     
-  int     Ypos;  // final position     
-  
-  bool    GoodX;      
-  bool    GoodY;      
  
-  bool    FrontHit;
-  bool    BackHit;
+  bool GoodPosition;
+  bool GoodTimeGate;
+  bool GoodposGate;
 
-  double  fTimestamp;
+  double fId;
+  double xpos;
+  double ypos;
+  
+  double Xpos;
+  double Ypos;
 
-  double  fxEsum;     
-  double  fxE;        
-  double  fxMaxE;     
-  double  fxMaxStrip; 
-  double  fyEsum;     
-  double  fyE;        
-  double  fyMaxE;     
-  double  fyMaxStrip; 
+  double fEcal;
+  double fEnergy;
 
-  int     fxMult;
-  int     fyMult;
+  double fxWEsum;
+  double fyWEsum;
+   
+  double fxEsum; 
+  double fyEsum;
+  double fxMaxE;
+  double fyMaxE; 
+   
+  double fxMaxStrip;
+  double fyMaxStrip;
+   
+  double FrontTimestamp;
+  double BackTimestamp;
+  double fTimestamp;
+   
+  double XStripDeviation;
+  double YStripDeviation;
+ 
 
  ClassDef(GDSSD,1);
 };

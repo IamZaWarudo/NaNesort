@@ -27,7 +27,6 @@ void GBCS::Reset() {
  fSSSDLow.Reset();
  fSSSDHigh.Reset();
 
- fCloverHits.clear();
 }
 
 

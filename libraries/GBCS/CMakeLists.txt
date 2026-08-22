@@ -6,7 +6,6 @@ add_library(GBCS SHARED
   GSSSD.cxx
   GLaBr.cxx
   GClover.cxx
-  GCloverHit.cxx
   PIDGates.cxx
 )
 
@@ -23,7 +22,6 @@ root_generate_dictionary(G__GBCS
   TOFCorrector.h
   GSSSD.h
   GClover.h
-  GCloverHit.h
   GLaBr.h
   PIDGates.h
   MODULE GBCS

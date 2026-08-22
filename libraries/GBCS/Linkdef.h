@@ -8,10 +8,8 @@
 
 #pragma link C++ class TOFCorrector+;
 
-#pragma link C++ class GCloverHit+;
-#pragma link C++ class std::vector<GCloverHit>+;
-
 #pragma link C++ class GClover+;
+#pragma link C++ class std::vector<GClover>+;
 #pragma link C++ class GLaBr+;
 
 

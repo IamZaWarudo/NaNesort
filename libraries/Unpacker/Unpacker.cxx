@@ -59,17 +59,11 @@ for(const auto &hit : hits) {
        bcs.fSSSDLow.Unpack(hit,hit.GetId()-192);
        break;
       case 208 ... 223:
-     //  fLaBr.Get(hit.GetId() - 208, hit);  // LaBr Crystals
+       //fLaBr.Get(hit.GetId() - 208, hit);  // LaBr Crystals
         break;
       case 224 ... 287:  // 16 Clover x 4 crystals
        bcs.fClover.Unpack(hit);
        bcs.fClover.fCloverHits.push_back(hit);
-       
-        //bcs.GCloverHit xtal;
-        //xtal.Unpack(hit,hit.GetId() -224);
-        //fCloverHits.push_back(xtal);
-       //fCrystal.Unpack(hit,hit.GetId() - 224);
-        
         break;
 
       default:
@@ -77,7 +71,8 @@ for(const auto &hit : hits) {
     }
   }
 
-
+  bcs.fDSSD.Finalize();
+  bcs.fDSSDLow.Finalize();
 }
 
 

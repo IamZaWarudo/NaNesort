@@ -17,7 +17,7 @@ void GPIN::Unpack(const ddasHit& hit) {
   fEcal = hit.GetEcal();
 }
 
-bool GPIN::HasHit(){ 
+bool GPIN::HasHit() const{ 
   if(fEcal >0)
     return true;
   return false;

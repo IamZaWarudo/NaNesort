@@ -53,17 +53,13 @@ void GDSSD::UnpackFront(const ddasHit& hit) {
 
   fxWEsum += xpos * fEcal;
   fxEsum  += fEcal;
-   if(fxEsum <= 0) return;  // Energy gate
 
-  Xpos = fxWEsum / fxEsum;  // final X co-ord
 
-  if(fEcal >= fxMaxE){
+  if(fEcal > 0 && fEcal >= fxMaxE){
     fxMaxE = fEcal;
     fxMaxStrip = xpos;
     FrontTimestamp = hit.GetTimestamp();  
   }
-
-  XStripDeviation = std::abs(Xpos - fxMaxStrip);
 
 }
 
@@ -81,26 +77,32 @@ void GDSSD::UnpackBack(const ddasHit& hit) {
 
   fyWEsum += ypos * fEcal;
   fyEsum  += fEcal;
-   if(fyEsum <= 0) return;  // Energy gate
 
-  Ypos = fyWEsum / fyEsum;  // final Y co-ord
 
-  if(fEcal >= fyMaxE){
+  if(fEcal > 0 && fEcal >= fyMaxE){
     fyMaxE = fEcal;
     fyMaxStrip = ypos;
     BackTimestamp = hit.GetTimestamp(); 
   }
 
-  YStripDeviation = std::abs(Ypos - fyMaxStrip);
-
 }
 
 
 
-bool GDSSD::HasPosition() {
+void GDSSD::Finalize() {
   GoodPosition = false;
 
   fTimestamp = FrontTimestamp; // front Strip - Max Energy used for Time ( consistent across all )
+
+  if(fxEsum > 0) {
+    Xpos = fxWEsum / fxEsum;
+    XStripDeviation = std::abs(Xpos - fxMaxStrip);
+  }
+  if(fyEsum > 0) {
+    Ypos = fyWEsum / fyEsum;
+    YStripDeviation = std::abs(Ypos - fyMaxStrip);
+  }
+
 
   double dt = FrontTimestamp - BackTimestamp;
   if( dt > 2 && dt < 14) {
@@ -118,8 +120,6 @@ bool GDSSD::HasPosition() {
 
   fEnergy = (fxEsum + fyEsum) * 0.5;  // DSSD Energy for comparison/ploting purposes 
 
-
- return GoodPosition; 
 }
 
 

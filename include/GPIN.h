@@ -11,7 +11,7 @@ class GPIN {
   void Unpack(const ddasHit& hit);
   void Reset();
 
-  bool HasHit();
+  bool HasHit() const;
 
  //private
   double fCharge;

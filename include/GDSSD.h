@@ -13,7 +13,8 @@ class GDSSD {
   
   void Reset();
 
-  bool HasPosition();
+  void Finalize();
+  bool HasPosition() const { return GoodPosition; }
 
 //  private:
  

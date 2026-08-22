@@ -14,7 +14,7 @@ class GSSSD {
 
 //  private:
 
-  bool HasHit();
+  bool HasHit() const;
   //bool Hit = false;
 
   double fSum;

@@ -82,6 +82,14 @@ void PID(const GBCS& bcs){
   GHistogramer::Get().Fill("PID/PID_Total", 3600,0,24000, tof,
                                             1800,0,12000, dE);
 
+  if(bcs.fSSSDLow.HasHit() == true){
+  GHistogramer::Get().Fill("PID/PID_Veto", 3600,0,24000, tof,
+                                            1800,0,12000, dE);}
+
+  if(bcs.fSSSDLow.HasHit() == false){
+  GHistogramer::Get().Fill("PID/PID_Implant+lightIon", 3600,0,24000, tof,
+                                            1800,0,12000, dE);}
+
 }
 
 

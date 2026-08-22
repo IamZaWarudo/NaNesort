@@ -25,7 +25,7 @@ void GSSSD::Unpack(const ddasHit& hit,int Id) {
 
 }
 
-bool GSSSD::HasHit(){ 
+bool GSSSD::HasHit() const{ 
   if(fSum>0) 
     return true;
   return false;

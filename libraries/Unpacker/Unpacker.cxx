@@ -59,7 +59,7 @@ for(const auto &hit : hits) {
        bcs.fSSSDLow.Unpack(hit,hit.GetId()-192);
        break;
       case 208 ... 223:
-       //fLaBr.Get(hit.GetId() - 208, hit);  // LaBr Crystals
+       bcs.fLaBr.Unpack(hit);  // LaBr Crystals
         break;
       case 224 ... 287:  // 16 Clover x 4 crystals
        bcs.fClover.Unpack(hit);
@@ -73,6 +73,8 @@ for(const auto &hit : hits) {
 
   bcs.fDSSD.Finalize();
   bcs.fDSSDLow.Finalize();
+  bcs.Classification();
+
 }
 
 

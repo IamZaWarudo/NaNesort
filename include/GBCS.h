@@ -17,17 +17,9 @@ class GBCS {
 
   void Reset();
 
-
-  //GDSSD DSSDLow;
-
-//  double Timestamp() const { return fDSSD.fTimestamp; }
-//  double TOF() const { return fI2SPin1.fEcal>0 ? fI2SPin1.fEcal : -1; } 
-//  int    X()   const { return fDSSD.Xpos; }
-//  int    Y()   const { return fDSSD.Ypos; }
-//
-//  void Print(int type=-1) const;
-  int EventType() const;
-
+  void Classification();
+  int EventType() const { return fEventType; }
+  int fEventType = 5;
 
 //private:
   
@@ -44,9 +36,7 @@ class GBCS {
   GSSSD fSSSDHigh;
 
   GClover fClover;
- 
-
-  int fEventType;
+  GLaBr fLaBr; 
 
 
 };

@@ -9,14 +9,14 @@ class GLaBr {
   GLaBr();
   ~GLaBr();
  
-  void Get(int Crystal, const ddasHit& hit); 
+  void Unpack(const ddasHit& hit); 
   void Reset();
 
  private: 
 
-  double fCharge;
   double fEcal;
-  double fTime;
+  double fCharge;
+  double fTimestamp;
 
 
   ClassDef(GLaBr,1);

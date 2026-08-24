@@ -5,17 +5,16 @@ GLaBr::GLaBr() { Reset();  }
 GLaBr::~GLaBr() {}
 
 void GLaBr::Reset() {
-  fCharge = 0;
-  fEcal   = 0;
-  fTime   = 0;
+  fCharge      = 0;
+  fEcal        = 0;
+  fTimestamp   = 0;
 }
 
 
-void GLaBr::Get(int Crystal, const ddasHit& hit) {
+void GLaBr::Unpack(const ddasHit& hit) {
   
-  fTime   = hit.GetTime();
+  fTimestamp  = hit.GetTimestamp();
   fCharge = hit.GetCharge();
   fEcal   = hit.GetEcal();
-  // fEcal = hit.GetEcal_labr();
 
 }

@@ -1,5 +1,3 @@
-
-
 #include <ddasHit.h>
 #include <Unpacker.h>
 #include <GBCS.h>
@@ -15,31 +13,120 @@ GBCS::GBCS() { }
 
 void GBCS::Reset() {
 
- // DSSDLow.Reset();  // Not using this - unreliable
- fDSSD.Reset();
+ fEventType = 5;
 
- fPin1.Reset();
+ fDSSD.Reset(); //------> Used for Position
+ fDSSDLow.Reset();
+
+ fPin1.Reset(); //------> Used for TOF
  fPin2.Reset();
   
- fI2SPin1.Reset();
+ fI2SPin1.Reset(); //---> Used for TOF
  fI2SPin2.Reset();
 
  fSSSDLow.Reset();
  fSSSDHigh.Reset();
 
+ fClover.Reset();
+}
+ 
+/*
+
+ +----------------+
+ | 1 - IMPLANT    |
+ | 2 - DECAY      |
+ | 3 - LIGHTIONS  |
+ | 4 - VETO       |
+ | 5 - UNKNOWN    |
+ +----------------+
+
+*/
+
+void GBCS::Classification() {
+
+  fEventType = 5;  // Unknown
+
+
+
+bool hasGoodPosition  = false;
+bool hasBadPosition   = false;
+bool hasDSSD          = false;
+bool hasSSSDL         = false;
+bool hasSSSDH         = false;
+
+bool hasPin           = false;
+bool hasTOF           = false;
+
+bool PinLightIon      = false;
+bool SSSDHLightIon    = false;
+
+bool IsImplant        = false; 
+bool IsDecay          = false;
+bool IsLightIon       = false;
+bool IsVeto           = false;
+
+
+if(fPin1.HasHit() == true && fPin2.HasHit() == true) {
+  hasPin = true;
+}
+
+if(fPin1.HasHit() == true && fI2SPin1.HasHit() == true) {
+  hasTOF = true;
+}
+
+
+if(fDSSD.HasPosition() == true) { 
+  hasGoodPosition = true; 
+}else
+if(fDSSD.HasPosition() == false) {
+  hasBadPosition  = true;
+}
+
+if(fSSSDLow.HasHit() == true) {
+  hasSSSDL = true;
+}
+
+if(fSSSDHigh.HasHit() == true) {
+  hasSSSDH = true;
+}
+
+if(hasPin && fPin1.fCharge < 3500) {
+  PinLightIon = true;
+}
+
+if(fSSSDHigh.fSum > 2600) {
+  SSSDHLightIon = true;
+}
+
+
+if(PinLightIon || SSSDHLightIon) {
+  IsLightIon = true;   //-------------> LightIons
+  fEventType = 3;
+}
+
+if(fDSSD.HasPosition()) {
+  hasDSSD = true;
+}
+
+
+if(hasPin && hasDSSD && hasSSSDL) {
+  IsVeto = true;   //-----------------> Veto
+  fEventType = 4;
+}
+
+
+if(hasPin && hasTOF && hasGoodPosition && !hasSSSDL && !IsLightIon) {
+  IsImplant = true; //----------------> Implant
+  fEventType = 1;
+}
+
+if(!hasPin && !hasTOF && hasGoodPosition && !hasSSSDL && !IsLightIon) {
+  IsDecay = true;
+  fEventType = 2;
 }
 
 
 
-
-
-int GBCS::EventType() const{
-
-int condition = 4;  // Unidentified
-
-//  fEventType =  condition;
- 
- return condition;
 }
 
 

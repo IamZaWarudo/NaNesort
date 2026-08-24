@@ -83,6 +83,21 @@ void PID(const GBCS& bcs){
   GHistogramer::Get().Fill("TOF/tof_corrected",500,0,5000, runtime,
                                                1500,0,25000, tof);
 
+if(bcs.EventType() == 1){
+  GHistogramer::Get().Fill("TOF/tof_Implant",500,0,5000, runtime,
+                                               1500,0,25000, tof);
+}
+else
+if(bcs.EventType() == 3) {
+  GHistogramer::Get().Fill("TOF/tof_Decay",500,0,5000, runtime,
+                                               1500,0,25000, tof);
+}
+else
+if(bcs.EventType() == 4) {
+  GHistogramer::Get().Fill("TOF/tof_Veto",500,0,5000, runtime,
+                                               1500,0,25000, tof);
+}
+
   GHistogramer::Get().Fill("PID/PID_Total", 3600,0,24000, tof,
                                             1800,0,12000, dE);
 

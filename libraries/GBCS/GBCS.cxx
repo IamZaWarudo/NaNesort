@@ -55,6 +55,7 @@ bool hasSSSDL         = false;
 bool hasSSSDH         = false;
 
 bool hasPin           = false;
+bool hasNoPin         = false;
 bool hasTOF           = false;
 
 bool PinLightIon      = false;
@@ -65,10 +66,18 @@ bool IsDecay          = false;
 bool IsLightIon       = false;
 bool IsVeto           = false;
 
+bool TOFGate          = false;
+
+
 
 if(fPin1.HasHit() == true && fPin2.HasHit() == true) {
   hasPin = true;
 }
+
+if(fPin1.HasHit() == false && fPin2.HasHit() == false && fI2SPin1.HasHit() == false) {
+  hasNoPin = true;
+}
+
 
 if(fPin1.HasHit() == true && fI2SPin1.HasHit() == true) {
   hasTOF = true;
@@ -115,12 +124,16 @@ if(hasPin && hasDSSD && hasSSSDL) {
 }
 
 
-if(hasPin && hasTOF && hasGoodPosition && !hasSSSDL && !IsLightIon) {
+if(fI2SPin1.fCharge > 8000 && fI2SPin1.fCharge < 18000) {
+  TOFGate = true;
+}
+
+if(hasPin && hasTOF && hasGoodPosition && !hasSSSDL && !IsLightIon && TOFGate) {
   IsImplant = true; //----------------> Implant
   fEventType = 1;
 }
 
-if(!hasPin && !hasTOF && hasGoodPosition && !hasSSSDL && !IsLightIon) {
+if(hasNoPin && !hasTOF && hasGoodPosition && !hasSSSDL && !IsLightIon) {
   IsDecay = true;
   fEventType = 2;
 }

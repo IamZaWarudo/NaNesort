@@ -118,19 +118,24 @@ void PID(const GBCS& bcs){
 void Gamma(const GBCS& bcs){
 
   if(bcs.EventType() == 1) {   // IMPLANT
-  GHistogramer::Get().Fill("Clover/Gamma_Implant", 3600,0,24000, bcs.fClover.fEcal);
+  GHistogramer::Get().Fill("Clover/Gamma_Implant", 3600,0,24000, bcs.fDSSD.fEnergy,
+                                                  3600,0,24000, bcs.fClover.fEcal);
   } else
   if(bcs.EventType() == 2) {  // DECAY
-  GHistogramer::Get().Fill("Clover/Gamma_Decay", 3600,0,24000,bcs.fClover.fEcal);
+   GHistogramer::Get().Fill("Clover/Gamma_Decay", 3600,0,24000, bcs.fDSSD.fEnergy,
+                                                  3600,0,24000, bcs.fClover.fEcal);
   } else
   if(bcs.EventType() == 3) {  // LIGHTION
-  GHistogramer::Get().Fill("Clover/Gamma_LightIons", 3600,0,24000,bcs.fClover.fEcal);
+   GHistogramer::Get().Fill("Clover/Gamma_LightIon", 3600,0,24000, bcs.fDSSD.fEnergy,
+                                                  3600,0,24000, bcs.fClover.fEcal);
   } else
   if(bcs.EventType() == 4) {  // VETO
-  GHistogramer::Get().Fill("Clover/Gamma_Veto", 3600,0,24000, bcs.fClover.fEcal);
+   GHistogramer::Get().Fill("Clover/Gamma_Veto", 3600,0,24000, bcs.fDSSD.fEnergy,
+                                                  3600,0,24000, bcs.fClover.fEcal);
   } else
   if(bcs.EventType() == 5) {  // UNKNOWN
-  GHistogramer::Get().Fill("Clover/Gamma_Unknown", 3600,0,24000,bcs.fClover.fEcal);
+   GHistogramer::Get().Fill("Clover/Gamma_Unknown", 3600,0,24000, bcs.fDSSD.fEnergy,
+                                                  3600,0,24000, bcs.fClover.fEcal);
   }
 
 

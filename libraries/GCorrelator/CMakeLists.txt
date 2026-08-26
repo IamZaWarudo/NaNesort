@@ -12,6 +12,7 @@ target_link_libraries(GCORRELATOR
   PUBLIC
     GBCS
     GHISTOGRAMER
+    FILLHISTOGRAM
     ROOT::Core
     ROOT::RIO
     ROOT::Hist

@@ -16,11 +16,12 @@
 #include <GBCS.h>
 #include <Unpacker.h>
 #include <FillHistogram.h>
+#include <GCorrelator.h>
 #include <globals.h>
 #include <utils.h>
 
 
-void ProcessEvent(Unpacker& unpacker, GBCS& bcs, std::vector<ddasHit>& event);
+void ProcessEvent(Unpacker& unpacker, GBCS& bcs, GCorrelator& corr, std::vector<ddasHit>& event);
 
 
 // ---- event type tally ----
@@ -122,11 +123,12 @@ int main(int argc, char** argv) {
 
   Unpacker unpacker;
   GBCS bcs;
+  GCorrelator corr;
   std::vector<ddasHit> event;
 
   while(!converter.Finished() || !converter.Empty()) {
     if(converter.TryPop(event)) {
-      ProcessEvent(unpacker, bcs, event);
+      ProcessEvent(unpacker, bcs, corr, event);
       event.clear();
     }
 
@@ -185,15 +187,19 @@ int main(int argc, char** argv) {
 
   PrintEventTypeSummary(); /// temporary
 
+  corr.Flush();
+  corr.Print();
+
   GHistogramer::Get().Close();
   return 0;
 }
 
 
-void ProcessEvent(Unpacker& unpacker, GBCS& bcs, std::vector<ddasHit>& event) {
+void ProcessEvent(Unpacker& unpacker, GBCS& bcs, GCorrelator& corr, std::vector<ddasHit>& event) {
 
   unpacker.Unpack(bcs, event);   // Unpack() calls bcs.Reset() & bcs.classification()
   FillHistograms(bcs, event);
+  corr.AddEvent(bcs);
 
   const int et = bcs.EventType();
   if(et >= 0 && et < kNEventTypes) ++gTypeCount[et];

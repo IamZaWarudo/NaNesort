@@ -17,7 +17,7 @@ void GClover::Unpack(const ddasHit& hit) {
   fId = hit.GetId() - 224;
   fCharge = hit.GetCharge();
   fTimestamp = hit.GetTimestamp();
-  fEcal = hit.GetEcal();
+  fEcal = hit.GetEcal();  // overwritten every loop
 }
 
 bool GClover::HasHit() const{

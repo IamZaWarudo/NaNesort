@@ -7,6 +7,8 @@
 #include <utils.h>
 
 #include <TString.h>
+#include <TKey.h>
+#include <TCutG.h>
 
 #include <cstdio>
 #include <memory>
@@ -157,23 +159,50 @@ void Gamma(const GBCS& bcs){
 
 }
 
+
+void LoadPIDs() { //TODO make me find the file better
+  TDirectory *current = gDirectory;
+  
+  pids = new TList;
+
+  TFile *cuts = TFile::Open("pid.cuts");
+  TIter iter(cuts->GetListOfKeys());
+  while(TKey *key =(TKey*)iter.Next()) {
+    pids->Add(key->ReadObj());    
+  }
+  current->cd();
+};
+
+
+
 // ---------------------------------------------------------------
 // Correlations
 // ---------------------------------------------------------------
 void Correlation(const GBCS& implant, const GBCS& decay, double dt){
 
-  GHistogramer::Get().Fill("Correlation/dt", 4000, -1000, 3000, dt);
+  if(!pids) 
+    LoadPIDs();
+
+  TIter iter(pids);
+  while(TCutG *cut = (TCutG*)iter.Next()) {
+  
+  const double tof = CorrectedTOF(implant);
+  const double dE  = implant.fPin1.fEcal;
+  if(!cut->IsInside(tof,dE)) continue;
 
 
-  GHistogramer::Get().Fill("Correlation/implant_dt_DSSD", 4000,-1000,3000, dt,
+  GHistogramer::Get().Fill(Form("%s/dt",cut->GetName()), 4000, -1000, 3000, dt);
+
+
+  GHistogramer::Get().Fill(Form("%s/implant_dt_DSSD",cut->GetName()), 4000,-1000,3000, dt,
                            3600,0,64000, implant.fDSSD.fEnergy);
 
  for(const auto& g : decay.fClover.fCloverHits) {
   double energy = g.GetEcal();
   if(energy <= 0) continue;
 
-  GHistogramer::Get().Fill("Correlation/decay_gamma",1000,0,4000, energy);
-  GHistogramer::Get().Fill("Correlation/decay_dt_gamma",4000, -1000, 3000,dt,
+  GHistogramer::Get().Fill(Form("%s/decay_gamma",cut->GetName()),1000,0,4000, energy);
+  GHistogramer::Get().Fill(Form("%s/decay_dt_gamma",cut->GetName()),4000, -1000, 3000,dt,
                            1000,0,4000, energy);
  }
 
@@ -181,20 +210,21 @@ void Correlation(const GBCS& implant, const GBCS& decay, double dt){
   double energy = g.GetEcal();
   if(energy <= 0) continue;
 
-  GHistogramer::Get().Fill("Correlation/implant_gamma",1000,0,4000, energy);
-  GHistogramer::Get().Fill("Correlation/implant_tof_gamma", 1000,0,4000, energy,
+  GHistogramer::Get().Fill(Form("%s/implant_gamma",cut->GetName()),1000,0,4000, energy);
+  GHistogramer::Get().Fill(Form("%s/implant_tof_gamma",cut->GetName()), 1000,0,4000, energy,
                                                             2000,0,24000, CorrectedTOF(implant));
 
   }
   
-  GHistogramer::Get().Fill("Correlation/position", 40,0,40, decay.fDSSD.Xpos,
+  GHistogramer::Get().Fill(Form("%s/position",cut->GetName()), 40,0,40, decay.fDSSD.Xpos,
                            40,0,40, decay.fDSSD.Ypos);
+  }
 }
 
 
 void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
 
-  GHistogramer::Get().Fill("Correlation/dt_allpairs", 4000,-1000,3000, dt);
+  //GHistogramer::Get().Fill(Form("%s/dt_allpairs",cut->GetName()), 4000,-1000,3000, dt);
 }
 
 

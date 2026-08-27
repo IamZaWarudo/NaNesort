@@ -6,7 +6,10 @@
 #include <ddasHit.h>
 #include <GCorrelator.h>
 
+TList *pids = 0;
+
 void LoadTOF(int run);
+void LoadPIDs();
 double CorrectedTOF(const GBCS& bcs);
 
 void FillHistograms(const GBCS& bcs, const std::vector<ddasHit>& hits);

@@ -210,46 +210,59 @@ void TOFCorrector::FitTOF(TH2* tof_time) {
 }
 
 
-void TOFCorrector::MakeCorrectionFile(std::string fname, TH2  *tof_time) { 
 
-  TFile *f =0;
-  //if(fname.length()==0)
-  //  f =_file0;
-  //else
-  f = TFile::Open(fname.c_str());
+void TOFCorrector::MakeCorrectionFile(std::string fname, TH2 *tof_time) {
 
-//  int run,subrun;
-//  getRunNumber(fname,run,subrun);
-//  printf("fname: %s\n",fname.c_str());
-//  printf("run: %i\n",run);
-//  printf("subrun: %i\n",subrun);
-
-// so it can read histXXXX and histXXXX-XX
-int run = -1;
-int subrun = -1;
+  // so it can read histXXXX and histXXXX-XX
+  int run = -1;
+  int subrun = -1;
 
   if(!getRunNumber(fname, run, subrun)) {
-    fprintf( stderr,"Could not determine run number from: %s\n",fname.c_str());
+    fprintf(stderr,"Could not determine run number from: %s\n",fname.c_str());
     return;
   }
   printf("fname: %s\n", fname.c_str());
   printf("run: %i\n", run);
   if(subrun >= 0)
     printf("subrun: %i\n", subrun);
-  if(!f)
+
+  TDirectory *current = gDirectory;
+
+  TFile *f = TFile::Open(fname.c_str());
+  if(!f || f->IsZombie())
     return;
-
-
 
   if(!tof_time)
     tof_time = (TH2*)f->Get("tof_time");  //this is a 2d: xaxis runtime, yaxis TOF.
 
+  if(!tof_time) {
+    fprintf(stderr,"No tof_time histogram in: %s\n",fname.c_str());
+    f->Close();
+    current->cd();
+    return;
+  }
+
+  MakeCorrectionFile(tof_time, run, subrun);
+
+  f->Close();
+  current->cd();
+}
+
+
+void TOFCorrector::MakeCorrectionFile(TH2 *tof_time, int run, int subrun) {
+
+  if(!tof_time) {
+    fprintf(stderr,"MakeCorrectionFile: no histogram supplied\n");
+    return;
+  }
+
+  TDirectory *current = gDirectory;
+
   fTofTime = (TH2*)tof_time->Clone(Form("%s_clone",tof_time->GetName()));
+  fTofTime->SetDirectory(0);   // survive the input file being closed
 
   FitTOF(fTofTime);
 
-  TDirectory *current =gDirectory;
- 
   gSystem->mkdir("tof",true);
   std::string correctionFilename;
   if(subrun >= 0) {
@@ -257,12 +270,14 @@ int subrun = -1;
   } else {
     correctionFilename = Form("tof/tof%04i.tof", run);
   }
-  
+
   TFile* ofile = TFile::Open(correctionFilename.c_str(), "recreate");
-    this->Write();
-    ofile->Close();
-    current->cd();
-  } 
+  this->Write();
+  ofile->Close();
+  current->cd();
+
+  printf("Wrote TOF correction: %s\n", correctionFilename.c_str());
+}
 
 
 

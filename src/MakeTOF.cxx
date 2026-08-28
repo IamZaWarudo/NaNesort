@@ -7,7 +7,9 @@
 #include <filesystem>
 
 #include <TSystem.h>
-
+#include <TFile.h>
+#include <TH2.h>
+#include <TOFCorrector.h>
 #include <evtLoop.h>
 #include <ddasLoop.h>
 #include <ddasHit.h>
@@ -191,8 +193,32 @@ int main(int argc, char** argv) {
   corr.Print();
 
   GHistogramer::Get().Close();
+
+  // ---- build the TOF correction from the histogram we just wrote ----
+  TDirectory* current = gDirectory;
+
+  TFile* spline = TFile::Open(ofile.c_str());
+  if(!spline || spline->IsZombie()) {
+    printf(RED "Could not reopen %s - no TOF correction made\n" RESET_COLOR, ofile.c_str());
+    return 1;
+  }
+
+  TH2* tof_time = dynamic_cast<TH2*>(spline->Get("tof"));
+  if(!tof_time) {
+    printf(RED "No 'tof' histogram in %s - no TOF correction made\n" RESET_COLOR, ofile.c_str());
+    spline->Close();
+    current->cd();
+    return 1;
+  }
+
+  TOFCorrector corrector;
+  corrector.MakeCorrectionFile(tof_time, run);
+
+  spline->Close();
+  current->cd();
   return 0;
 }
+
 
 
 void ProcessEvent(Unpacker& unpacker, GBCS& bcs, GCorrelator& corr, std::vector<ddasHit>& event) {

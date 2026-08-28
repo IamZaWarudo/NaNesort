@@ -24,7 +24,8 @@ class TOFCorrector : public TObject {
     void Copy(TOFCorrector &other) const;
 
     void FitTOF(TH2 *tof_time=0); 
-    void MakeCorrectionFile(std::string fname="",TH2 *tof_time=0); // 
+    void MakeCorrectionFile(std::string fname="",TH2 *tof_time=0);
+    void MakeCorrectionFile(TH2 *tof_time, int run, int subrun=-1); // 
 
     void Draw() const;
 

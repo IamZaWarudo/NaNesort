@@ -18,7 +18,6 @@ void Channel(const std::vector<ddasHit>& hits);
 void PID(const GBCS& bcs);
 void Gamma(const GBCS& bcs);
 void Correlation(const GBCS& implant, const GBCS& decay, double dt);
-void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt);
 void Other(const GBCS& bcs, const std::vector<ddasHit>& hits);
 
 

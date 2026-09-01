@@ -90,7 +90,7 @@ void GCorrelator::CorrelateDecay(const GBCS& dec) {
 
     fCandidates.push_back({&imp, dt});
 
-    CorrelationAllPairs(imp, dec, dt);  // using this to see how many pairs am I throwing away
+    // CorrelationAllPairs(imp, dec, dt);  // using this to see how many pairs am I throwing away
   }
 
  if(fCandidates.size() != 1){

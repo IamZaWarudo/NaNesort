@@ -102,35 +102,13 @@ if(bcs.EventType() == 4) {
 */
   GHistogramer::Get().Fill("PID/PID_Total", 3600,0,24000, tof,
                                             1800,0,12000, dE);
-
-
+ 
   if(bcs.EventType() == 1) {   // IMPLANT
   GHistogramer::Get().Fill("PID/PID_Implant", 3600,0,24000, tof,
                                                 1800,0,12000, dE);
-  } else 
-  if(bcs.EventType() == 2) {  // DECAY
-  GHistogramer::Get().Fill("PID/PID_Decay", 3600,0,24000, tof,
-                                              1800,0,12000, dE);
-  } else 
-  if(bcs.EventType() == 3) {  // LIGHTION
-  GHistogramer::Get().Fill("PID/PID_LightIons", 3600,0,24000, tof,
-                                                  1800,0,12000, dE);
-  } else 
-  if(bcs.EventType() == 4) {  // VETO
-  GHistogramer::Get().Fill("PID/PID_Veto", 3600,0,24000, tof,
-                                             1800,0,12000, dE);
-  } else 
-  if(bcs.EventType() == 5) {  // UNKNOWN
-  GHistogramer::Get().Fill("PID/PID_Unknown", 3600,0,24000, tof,
-                                                1800,0,12000, dE);
-  }
-
+  } 
 }
-
-
-
  
-
 
 void Gamma(const GBCS& bcs){
 
@@ -141,22 +119,7 @@ void Gamma(const GBCS& bcs){
   if(bcs.EventType() == 2) {  // DECAY
    GHistogramer::Get().Fill("Clover/Gamma_Decay", 3600,0,24000, bcs.fDSSD.fEnergy,
                                                   3600,0,24000, bcs.fClover.fEcal);
-  } else
-  if(bcs.EventType() == 3) {  // LIGHTION
-   GHistogramer::Get().Fill("Clover/Gamma_LightIon", 3600,0,24000, bcs.fDSSD.fEnergy,
-                                                  3600,0,24000, bcs.fClover.fEcal);
-  } else
-  if(bcs.EventType() == 4) {  // VETO
-   GHistogramer::Get().Fill("Clover/Gamma_Veto", 3600,0,24000, bcs.fDSSD.fEnergy,
-                                                  3600,0,24000, bcs.fClover.fEcal);
-  } else
-  if(bcs.EventType() == 5) {  // UNKNOWN
-   GHistogramer::Get().Fill("Clover/Gamma_Unknown", 3600,0,24000, bcs.fDSSD.fEnergy,
-                                                  3600,0,24000, bcs.fClover.fEcal);
-  }
-
-
-
+  } 
 }
 
 
@@ -220,13 +183,6 @@ void Correlation(const GBCS& implant, const GBCS& decay, double dt){
                            40,0,40, decay.fDSSD.Ypos);
   }
 }
-
-
-void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
-
-  //GHistogramer::Get().Fill(Form("%s/dt_allpairs",cut->GetName()), 4000,-1000,3000, dt);
-}
-
 
 
 void Other(const GBCS& bcs, const std::vector<ddasHit>& hits){

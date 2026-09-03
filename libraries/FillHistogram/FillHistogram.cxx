@@ -185,6 +185,27 @@ void Correlation(const GBCS& implant, const GBCS& decay, double dt){
 }
 
 
+void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
+
+  if(!pids) 
+    LoadPIDs();
+
+  TIter iter(pids);
+  while(TCutG *cut = (TCutG*)iter.Next()) {
+
+  GHistogramer::Get().Fill(Form("%s/dt_allPairs",cut->GetName()), 4000, -1000, 3000, dt);
+
+   for(const auto& g : decay.fClover.fCloverHits) {
+    double energy = g.GetEcal();
+    if(energy <= 0) continue;
+  
+    GHistogramer::Get().Fill(Form("%s/decay_dt_gamma_allPairs",cut->GetName()),4000, -1000, 3000,dt,
+                                                                                1000,0,4000, energy);
+   }
+
+ }
+}
+
 void Other(const GBCS& bcs, const std::vector<ddasHit>& hits){
 
 

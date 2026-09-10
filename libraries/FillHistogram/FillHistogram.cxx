@@ -82,9 +82,13 @@ void PID(const GBCS& bcs){
   double dE  = bcs.fPin1.fEcal;
   double runtime = bcs.fPin1.fTimestamp / 1.e8 ;
 
-  GHistogramer::Get().Fill("I2Tac_TOF",1500,0,25000,bcs.fI2TAC.fEcal,
-                                      1500,0,25000, tof);
 
+  if(bcs.EventType() == 1) { //Implant
+    
+    GHistogramer::Get().Fill("I2TAC_tof",5000,10000,15000,bcs.fI2TAC.fEcal,
+                                         6000,10000,16000,tof);
+
+  }
 
   GHistogramer::Get().Fill("TOF/tof_corrected",500,0,5000, runtime,
                                                1500,0,25000, tof);

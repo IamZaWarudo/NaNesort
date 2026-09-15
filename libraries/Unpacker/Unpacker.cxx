@@ -16,6 +16,7 @@ Unpacker::~Unpacker() {}
 void Unpacker::Unpack(GBCS& bcs, std::vector<ddasHit>& hits) {
 
 bcs.Reset();
+double TACValue = 64000;  // initializing to a hiher number
 
 for(const auto &hit : hits) {
   switch(hit.GetId()) {
@@ -44,9 +45,13 @@ for(const auto &hit : hits) {
 //     fI2SPin2.Unpack(hit);    // Pin2 lwk dead 
         break;
       case 180:
-       bcs.fI2TAC.Unpack(hit);
+       TACValue = hit.GetEcal();
+       if(TACValue < 27000){      
+         bcs.fI2TAC.Unpack(hit);
+        }
         break;
       case 181:
+
        bcs.fPin1.Unpack(hit);
         break;
       case 182:

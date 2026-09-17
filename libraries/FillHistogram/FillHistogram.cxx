@@ -85,7 +85,14 @@ void PID(const GBCS& bcs){
   double runtime = bcs.fPin1.fTimestamp / 1.e8 ;
 
 
+
+
+
   if(bcs.EventType() == 1) { //Implant
+    
+    GHistogramer::Get().Fill("PID/Pin1vsPin2",3000,0,10000,bcs.fPin1.fEcal,
+                                              3000,0,10000,bcs.fPin2.fEcal);
+
     GHistogramer::Get().Fill("I2TAC_tof",6000,0,24000,I2TAC,
                                          6000,0,24000,tof);
   

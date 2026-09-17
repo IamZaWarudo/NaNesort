@@ -46,7 +46,7 @@ for(const auto &hit : hits) {
         break;
       case 180:
        TACValue = hit.GetEcal();
-       if(TACValue < 27000){      
+       if(TACValue < 19000 && TACValue > 5000){      
          bcs.fI2TAC.Unpack(hit);
         }
         break;

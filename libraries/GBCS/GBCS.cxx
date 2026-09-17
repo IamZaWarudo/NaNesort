@@ -23,6 +23,7 @@ void GBCS::Reset() {
   
  fI2SPin1.Reset(); //---> Used for TOF
  fI2SPin2.Reset();
+ fI2TAC.Reset();
 
  fSSSDLow.Reset();
  fSSSDHigh.Reset();
@@ -79,7 +80,7 @@ if(fPin1.HasHit() == false && fPin2.HasHit() == false && fI2SPin1.HasHit() == fa
 }
 
 
-if(fPin1.HasHit() == true && fI2SPin1.HasHit() == true) {
+if(fPin1.HasHit() == true && fI2SPin1.HasHit() == true && fI2TAC.HasHit() == true) {
   hasTOF = true;
 }
 

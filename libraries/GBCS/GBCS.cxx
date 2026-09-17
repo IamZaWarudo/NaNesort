@@ -47,8 +47,6 @@ void GBCS::Classification() {
 
   fEventType = 5;  // Unknown
 
-
-
 bool hasGoodPosition  = false;
 bool hasBadPosition   = false;
 bool hasDSSD          = false;

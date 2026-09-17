@@ -80,7 +80,7 @@ void Channel(const std::vector<ddasHit>& hits){
 void PID(const GBCS& bcs){
   double I2TAC = bcs.fI2TAC.fEcal;
   double uncorr_tof = CorrectedTOF(bcs);
-  double tof = uncorr_tof - 0.228839 * I2TAC;
+  double tof = uncorr_tof - 0.056464 * I2TAC;
   double dE  = bcs.fPin1.fEcal;
   double runtime = bcs.fPin1.fTimestamp / 1.e8 ;
 
@@ -118,6 +118,8 @@ if(bcs.EventType() == 4) {
                                                1500,0,25000, tof);
 }
 */
+  
+
   GHistogramer::Get().Fill("PID/PID_Total", 3600,0,24000, tof,
                                             1800,0,12000, dE);
  

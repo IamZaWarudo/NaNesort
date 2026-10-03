@@ -85,40 +85,10 @@ void PID(const GBCS& bcs){
   double runtime = bcs.fPin1.fTimestamp / 1.e8 ;
 
 
-
-
-
-  if(bcs.EventType() == 1) { //Implant
-    
-    GHistogramer::Get().Fill("PID/Pin1vsPin2",3000,0,10000,bcs.fPin1.fEcal,
-                                              3000,0,10000,bcs.fPin2.fEcal);
-
-    GHistogramer::Get().Fill("I2TAC_tof",6000,0,24000,I2TAC,
-                                         6000,0,24000,tof);
   
-    GHistogramer::Get().Fill("I2TAC_spec",5000,0,50000,I2TAC);
-
-  }
 
   GHistogramer::Get().Fill("TOF/tof_corrected",500,0,5000, runtime,
-                                               1500,0,25000, tof);
-/*
-if(bcs.EventType() == 1){
-  GHistogramer::Get().Fill("TOF/tof_Implant",500,0,5000, runtime,
-                                               1500,0,25000, tof);
-}
-else
-if(bcs.EventType() == 3) {
-  GHistogramer::Get().Fill("TOF/tof_Lightion",500,0,5000, runtime,
-                                               1500,0,25000, tof);
-}
-else
-if(bcs.EventType() == 4) {
-  GHistogramer::Get().Fill("TOF/tof_Veto",500,0,5000, runtime,
-                                               1500,0,25000, tof);
-}
-*/
-  
+                                              1500,0,25000, tof);
 
   GHistogramer::Get().Fill("PID/PID_Total", 3600,0,24000, tof,
                                             1800,0,12000, dE);
@@ -126,6 +96,12 @@ if(bcs.EventType() == 4) {
   if(bcs.EventType() == 1) {   // IMPLANT
   GHistogramer::Get().Fill("PID/PID_Implant", 3600,0,24000, tof,
                                                 1800,0,12000, dE);
+  
+  GHistogramer::Get().Fill("PID/Pin1vsPin2",3000,0,10000,bcs.fPin1.fEcal,
+                                              3000,0,10000,bcs.fPin2.fEcal);
+
+  GHistogramer::Get().Fill("I2TAC_tof",6000,0,24000,I2TAC,
+                                         6000,0,24000,tof);
   } 
 }
  
@@ -161,7 +137,10 @@ void LoadPIDs() { //TODO make me find the file better
 // ---------------------------------------------------------------
 // Correlations
 // ---------------------------------------------------------------
+
+
 void Correlation(const GBCS& implant, const GBCS& decay, double dt){
+
 
   if(!pids) 
     LoadPIDs();
@@ -174,35 +153,23 @@ void Correlation(const GBCS& implant, const GBCS& decay, double dt){
   if(!cut->IsInside(tof,dE)) continue;
 
 
-  GHistogramer::Get().Fill(Form("%s/dt",cut->GetName()), 4000, -1000, 3000, dt);
+  GHistogramer::Get().Fill(Form("%s/O2O/dt",cut->GetName()), 4000, -1000, 3000, dt);
 
-
-  GHistogramer::Get().Fill(Form("%s/implant_dt_DSSD",cut->GetName()), 4000,-1000,3000, dt,
-                           3600,0,64000, implant.fDSSD.fEnergy);
 
  for(const auto& g : decay.fClover.fCloverHits) {
   double energy = g.GetEcal();
   if(energy <= 0) continue;
 
-  GHistogramer::Get().Fill(Form("%s/decay_gamma",cut->GetName()),1000,0,4000, energy);
-  GHistogramer::Get().Fill(Form("%s/decay_dt_gamma",cut->GetName()),4000, -1000, 3000,dt,
-                           1000,0,4000, energy);
+  GHistogramer::Get().Fill(Form("%s/O2O/decay_gamma",cut->GetName()),1000,0,4000, energy);
+  GHistogramer::Get().Fill(Form("%s/O2O/O2O_dt_gamma",cut->GetName()),4000, -1000, 3000,dt,
+                                                                      1000,0,4000, energy);
  }
 
-  for(const auto& g : implant.fClover.fCloverHits) {
-  double energy = g.GetEcal();
-  if(energy <= 0) continue;
-
-  GHistogramer::Get().Fill(Form("%s/implant_gamma",cut->GetName()),1000,0,4000, energy);
-  GHistogramer::Get().Fill(Form("%s/implant_tof_gamma",cut->GetName()), 1000,0,4000, energy,
-                                                            2000,0,24000, CorrectedTOF(implant));
-
+ 
   }
-  
-  GHistogramer::Get().Fill(Form("%s/position",cut->GetName()), 40,0,40, decay.fDSSD.Xpos,
-                           40,0,40, decay.fDSSD.Ypos);
-  }
+
 }
+
 
 
 void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
@@ -212,16 +179,32 @@ void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
 
   TIter iter(pids);
   while(TCutG *cut = (TCutG*)iter.Next()) {
+  
+  const double tof = CorrectedTOF(implant);
+  const double dE  = implant.fPin1.fEcal;
+  if(!cut->IsInside(tof,dE)) continue;
 
-  GHistogramer::Get().Fill(Form("%s/dt_allPairs",cut->GetName()), 4000, -1000, 3000, dt);
+
+
+  GHistogramer::Get().Fill(Form("%s/dt_HalfLife",cut->GetName()), 4000, -1000, 3000, dt);
+
+
+  GHistogramer::Get().Fill(Form("%s/implant_dt_DSSD",cut->GetName()), 4000,-1000,3000, dt,
+                                                                      3600,0,64000, implant.fDSSD.fEnergy);
+
+  GHistogramer::Get().Fill(Form("%s/position",cut->GetName()), 40,0,40, decay.fDSSD.Xpos,
+                                                               40,0,40, decay.fDSSD.Ypos);
+
+ 
 
    for(const auto& g : decay.fClover.fCloverHits) {
     double energy = g.GetEcal();
     if(energy <= 0) continue;
   
-    GHistogramer::Get().Fill(Form("%s/decay_dt_gamma_allPairs",cut->GetName()),4000, -1000, 3000,dt,
-                                                                                1000,0,4000, energy);
+  GHistogramer::Get().Fill(Form("%s/dt_gamma",cut->GetName()),4000, -1000, 3000,dt,
+                                                              1000,0,4000, energy);
    }
+  
 
  }
 }

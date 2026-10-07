@@ -85,7 +85,13 @@ void PID(const GBCS& bcs){
   double runtime = bcs.fPin1.fTimestamp / 1.e8 ;
 
 
-  
+if(bcs.EventType() == 2){ //Decay
+   double DT = (bcs.fClover.fTimestamp - bcs.fDSSD.fTimestamp);
+
+  GHistogramer::Get().Fill("gamma_dt",1000,-500,500,DT,
+                                      2000,0,4000,bcs.fClover.fEcal);                                                   
+}
+ 
 
   GHistogramer::Get().Fill("TOF/tof_corrected",500,0,5000, runtime,
                                               1500,0,25000, tof);
@@ -102,6 +108,7 @@ void PID(const GBCS& bcs){
 
   GHistogramer::Get().Fill("I2TAC_tof",6000,0,24000,I2TAC,
                                          6000,0,24000,tof);
+  
   } 
 }
  
@@ -224,3 +231,5 @@ void Other(const GBCS& bcs, const std::vector<ddasHit>& hits){
 
 
 }
+
+

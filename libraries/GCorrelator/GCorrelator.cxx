@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <GCorrelator.h>
+#include <GBCS.h>
 #include <FillHistogram.h>
 #include <globals.h>
 
@@ -90,6 +91,7 @@ void GCorrelator::CorrelateDecay(const GBCS& dec) {
 
     fCandidates.push_back({&imp, dt});
 
+    //GammaGate(imp, dec, dt);
     CorrelationAllPairs(imp, dec, dt);  // using this to see how many pairs am I throwing away
   }
 

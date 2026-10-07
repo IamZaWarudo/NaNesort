@@ -141,10 +141,37 @@ if(hasNoPin && !hasTOF && hasGoodPosition && !hasSSSDL && !IsLightIon) {
 
 }
 
-
-
-
 /*
+void GammaGate(const GBCS& Implant, const GBCS& Decay, double dt) {
+
+//----------------------------------------//
+//        isolating Na32 --> Mg32         //
+//----------------------------------------//
+
+const GFWHM = 100 // currently a random no.
+
+  for(const auto& G : Decay.fClover.fCloverHits) {
+  double Genergy = g.GetEcal();
+
+  if(
+    if(Genergy > 885 - GFWHM  && Genergy < 885 + GFHWM)    ||
+    if(Genergy > 1436 - GFWHM && Genergy < 1436 + GFHWM)   ||
+    if(Genergy > 1666 - GFWHM && Genergy < 1666 + GFHWM)   ||
+    if(Genergy > 1974 - GFWHM && Genergy < 1974 + GFHWM)   ||
+    if(Genergy > 2152 - GFWHM && Genergy < 2152 + GFHWM) 
+  ){
+    GammaGateHist(Implant, Decay, dt);
+  }
+
+
+
+
+}
+
+
+
+
+
 void GBCS::Print(int type) const {
   switch(fEventType) {
     case 1: //implant

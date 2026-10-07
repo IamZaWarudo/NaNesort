@@ -8,7 +8,7 @@
 #include <GSSSD.h>
 #include <GLaBr.h>
 #include <GClover.h>
-
+// #include <GCorrelate.h>
 
 class GBCS {
  public:
@@ -20,6 +20,8 @@ class GBCS {
   void Classification();
   int EventType() const { return fEventType; }
   int fEventType = 5;
+//  void GammaGate(const GBCS& Implant, const GBCS& Decay, double dt); 
+
 
 //private:
   

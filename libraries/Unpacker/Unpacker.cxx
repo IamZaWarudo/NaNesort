@@ -1,5 +1,5 @@
 #include <ddasHit.h>
-
+#include <iostream>
 #include <Unpacker.h>
 #include <GBCS.h>
 #include <GPIN.h>
@@ -14,6 +14,8 @@ Unpacker::~Unpacker() {}
 
 
 void Unpacker::Unpack(GBCS& bcs, std::vector<ddasHit>& hits) {
+
+int count = 0;
 
 bcs.Reset();
 double TACValue = 64000;  // initializing to a hiher number
@@ -74,7 +76,15 @@ for(const auto &hit : hits) {
       default:
       break;
     }
+   count++;
   }
+
+if(count < 100){
+  std::cout << "----Event---\n";
+  for (const auto& hit : bcs.fClover.fCloverHits) {
+    std::cout << "Clover : " << (hit.GetId() - 224) / 4 << "-" << (hit.GetId() - 224) % 4 << " -> Ecal : " << hit.GetEcal() << '\n';
+  }
+ }
 
   bcs.fDSSD.Finalize();
   bcs.fDSSDLow.Finalize();

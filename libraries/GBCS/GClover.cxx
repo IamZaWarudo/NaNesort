@@ -26,13 +26,12 @@ bool GClover::HasHit() const{
   return false;
 }
 
+
 void GClover::AddBack(){
 
+// Build individual clovers
 
  for(const auto& c : fCloverHits){
-  
-   // Do Something
-
   int AddBackClover = c.GetId() / 4 ;
   if(AddBackClover < 0 || AddBackClover >= 16) continue;
 

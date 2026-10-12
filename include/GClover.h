@@ -3,12 +3,16 @@
 
 #include <ddasHit.h>
 #include <vector>
+#include <string>
 
 
 class GClover {
  public:
   GClover();
   ~GClover();
+
+  bool XTalk[16][4][4] = {};
+  bool LoadXTalk(const char* filename);
 
   std::vector<ddasHit> fCloverHits;
 

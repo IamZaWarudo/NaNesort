@@ -15,7 +15,6 @@ Unpacker::~Unpacker() {}
 
 void Unpacker::Unpack(GBCS& bcs, std::vector<ddasHit>& hits) {
 
-int count = 0;
 
 bcs.Reset();
 double TACValue = 64000;  // initializing to a hiher number
@@ -76,7 +75,6 @@ for(const auto &hit : hits) {
       default:
       break;
     }
-   count++;
   }
 
 if(count < 100){

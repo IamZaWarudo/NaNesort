@@ -123,6 +123,8 @@ int main(int argc, char** argv) {
 
   Unpacker unpacker;
   GBCS bcs;
+  bcs.fClover.LoadTalk(Form("%s/../cals/XtalkCorr.dat", PATH.c_str()));
+
   GCorrelator corr;
   std::vector<ddasHit> event;
 

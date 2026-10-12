@@ -102,9 +102,6 @@ if(bcs.EventType() == 2){ //Decay
   if(bcs.EventType() == 1) {   // IMPLANT
   GHistogramer::Get().Fill("PID/PID_Implant", 3600,0,24000, tof,
                                                 1800,0,12000, dE);
-  
-  GHistogramer::Get().Fill("PID/Pin1vsPin2",3000,0,10000,bcs.fPin1.fEcal,
-                                              3000,0,10000,bcs.fPin2.fEcal);
 
   GHistogramer::Get().Fill("I2TAC_tof",6000,0,24000,I2TAC,
                                          6000,0,24000,tof);
@@ -148,7 +145,7 @@ void LoadPIDs() { //TODO make me find the file better
 
 void Correlation(const GBCS& implant, const GBCS& decay, double dt){
 
-
+/*
   if(!pids) 
     LoadPIDs();
 
@@ -174,6 +171,7 @@ void Correlation(const GBCS& implant, const GBCS& decay, double dt){
 
  
   }
+*/
 
 }
 
@@ -195,13 +193,8 @@ void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
 
   GHistogramer::Get().Fill(Form("%s/dt_HalfLife",cut->GetName()), 4000, -1000, 3000, dt);
 
-
-  GHistogramer::Get().Fill(Form("%s/implant_dt_DSSD",cut->GetName()), 4000,-1000,3000, dt,
-                                                                      3600,0,64000, implant.fDSSD.fEnergy);
-
   GHistogramer::Get().Fill(Form("%s/position",cut->GetName()), 40,0,40, decay.fDSSD.Xpos,
                                                                40,0,40, decay.fDSSD.Ypos);
-
  
 
    for(const auto& g : decay.fClover.fCloverHits) {
@@ -209,7 +202,7 @@ void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
     if(energy <= 0) continue;
   
   GHistogramer::Get().Fill(Form("%s/dt_gamma",cut->GetName()),4000, -1000, 3000,dt,
-                                                              1000,0,4000, energy);
+                                                              5000,0,5000, energy);
    }
   
 
@@ -218,7 +211,7 @@ void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
     if (decay.EventType() != 2) return;
     if(GammaAddback <= 0) continue;
   GHistogramer::Get().Fill(Form("%s/dt_gamma(AddBack)",cut->GetName()),4000,-1000,3000,dt,
-                                                                      4000,0,4000,GammaAddback);
+                                                                      5000,0,5000,GammaAddback);
   }
 
  }

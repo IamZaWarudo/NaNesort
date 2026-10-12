@@ -115,14 +115,14 @@ if(bcs.EventType() == 2){ //Decay
 
 void Gamma(const GBCS& bcs){
 
-  if(bcs.EventType() == 1) {   // IMPLANT
-  GHistogramer::Get().Fill("Clover/Gamma_Implant", 3600,0,24000, bcs.fDSSD.fEnergy,
-                                                  3600,0,24000, bcs.fClover.fEcal);
-  } else
-  if(bcs.EventType() == 2) {  // DECAY
-   GHistogramer::Get().Fill("Clover/Gamma_Decay", 3600,0,24000, bcs.fDSSD.fEnergy,
-                                                  3600,0,24000, bcs.fClover.fEcal);
+if(bcs.EventType() == 2) { 
+  for(int clover = 0; clover < 16; ++clover){
+    double GammaAddback = bcs.fClover.fAddback[clover];
+    if(GammaAddback <= 0) continue;
+  GHistogramer::Get().Fill("Decay_gamma(AddBack)",5000,0,5000,GammaAddback);
+   }
   } 
+
 }
 
 
@@ -212,6 +212,14 @@ void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
                                                               1000,0,4000, energy);
    }
   
+
+  for(int clover = 0; clover < 16; ++clover){
+    double GammaAddback = decay.fClover.fAddback[clover];
+    if (decay.EventType() != 2) return;
+    if(GammaAddback <= 0) continue;
+  GHistogramer::Get().Fill(Form("%s/dt_gamma(AddBack)",cut->GetName()),4000,-1000,3000,dt,
+                                                                      4000,0,4000,GammaAddback);
+  }
 
  }
 }

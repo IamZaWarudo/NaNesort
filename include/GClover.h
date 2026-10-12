@@ -11,7 +11,13 @@ class GClover {
   GClover();
   ~GClover();
 
-  bool XTalk[16][4][4] = {};
+  double XTalk[16][4][4] = {};
+  double CrystalEcal[16][4] = {};    // store Ecal in array
+  bool   ActiveCrystal[16][4] = {};  // check Active crystals 
+  double EcalCorrection[16][4] = {}; // Apply XTalk correction
+  double fAddback[16] = {};          // store addback as one clover
+
+  void AddBack();
   bool LoadXTalk(const char* filename);
 
   std::vector<ddasHit> fCloverHits;
@@ -19,9 +25,7 @@ class GClover {
   void Reset();
   void Unpack(const ddasHit& hit);
   bool HasHit() const;
- 
-  void AddBack();
-
+  
   int    fId;
   double fCharge;
   double fEcal;

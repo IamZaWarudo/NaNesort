@@ -77,13 +77,7 @@ for(const auto &hit : hits) {
     }
   }
 
-if(count < 100){
-  std::cout << "----Event---\n";
-  for (const auto& hit : bcs.fClover.fCloverHits) {
-    std::cout << "Clover : " << (hit.GetId() - 224) / 4 << "-" << (hit.GetId() - 224) % 4 << " -> Ecal : " << hit.GetEcal() << '\n';
-  }
- }
-
+  bcs.fClover.AddBack();
   bcs.fDSSD.Finalize();
   bcs.fDSSDLow.Finalize();
   bcs.Classification();

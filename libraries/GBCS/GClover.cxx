@@ -1,4 +1,6 @@
 #include <GClover.h>
+#include <fstream>
+
 
 GClover::GClover()  { Reset(); }
 GClover::~GClover() {}
@@ -10,6 +12,16 @@ void GClover::Reset() {
   fTimestamp = 0;
   fCharge    = 0;
   fCloverHits.clear();
+
+  for(int clover = 0; clover < 16; ++clover){
+    fAddback[clover] = 0.0;
+  for (int crystal = 0; crystal < 4; ++ crystal){
+    CrystalEcal[clover][crystal] = 0.0;
+    EcalCorrection[clover][crystal] = 0.0;
+    ActiveCrystal[clover][crystal] = false;
+   }
+  }
+
 }
 
 
@@ -28,38 +40,70 @@ bool GClover::HasHit() const{
   return false;
 }
 
-void GClover::LoadTalk(const char* filename) {  
+bool GClover::LoadXTalk(const char* filename) {  
   std::ifstream input(filename);
-  int clover;
+  if(!input) return false;
 
-  for(int block = 0; block < 16; ++block) {
-  for(int row = 0; row < 4; ++row) {
-    input >> clover;
+// read the Co-effs
+  double CoEffs[16][4][4] = {};
+  for(int block = 0; block < 16; ++block){
+  
+  for(int row = 0; row < 4; ++row){
+    int clover;
+    if(!(input >> clover) || clover != block) return false;
+  
+  for(int column = 0; column < 4; ++column){
+    if (!(input >> CoEffs[clover][row][column])) return false;
+  }}}
 
+// fill the Co-effs in XTalk
+  for(int clover = 0; clover < 16; ++clover)
+  for(int row = 0; row < 4; ++row)
   for(int column = 0; column < 4; ++column)
-    input >> Xtalk[clover][row][column];
-  }
-}
+    XTalk[clover][row][column] = CoEffs[clover][row][column];
 
+  return true;
 }
 
 void GClover::AddBack(){
+  
 
-// Build individual clovers
-
-// double Co-eff = XTalk(CloverID][i][j]
-
- for(const auto& c : fCloverHits){
-  int ID = c.GetId() -224;
-  if(ID < 0 || ID >= 16);  
-
-  int CloverID = (c.GetId() - 224) / 4 ;
-  int CrystalID = (c.GetId() - 224) % 4;
-
+  for(int clover = 0; clover < 16; ++clover){
+    fAddback[clover] = 0.0;
+  for (int crystal = 0; crystal < 4; ++ crystal){
+    CrystalEcal[clover][crystal] = 0.0;
+    EcalCorrection[clover][crystal] = 0.0;
+    ActiveCrystal[clover][crystal] = false;
+   }
+  }
 
 
+ for(const auto& hit : fCloverHits){
+  int id = hit.GetId() - 224;
+  if(id < 0 || id >=64) continue;
 
+  int clover = id / 4;
+  int crystal = id % 4;
+// might need to add a time gate for consecutive hits
+  CrystalEcal[clover][crystal] += hit.GetEcal();
+  ActiveCrystal[clover][crystal] = true;
  }
+
+ for(int clover = 0; clover < 16; ++clover){
+   for(int i = 0; i < 4; ++i){
+    if(!ActiveCrystal[clover][i]) continue;
+
+    double GammaBaby = CrystalEcal[clover][i];
+
+    for(int j = 0; j < 4; ++j){
+      GammaBaby += XTalk[clover][i][j] * CrystalEcal[clover][j];
+    }
+
+    EcalCorrection[clover][i] = GammaBaby;
+    fAddback[clover] += GammaBaby;
+   }
+ }
+
 }
 
 

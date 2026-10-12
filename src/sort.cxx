@@ -123,7 +123,11 @@ int main(int argc, char** argv) {
 
   Unpacker unpacker;
   GBCS bcs;
-  bcs.fClover.LoadTalk(Form("%s/../cals/XtalkCorr.dat", PATH.c_str()));
+  
+  bool loadXtalk = bcs.fClover.LoadXTalk(Form("%s/../cals/XtalkCorr.dat", PATH.c_str()));
+  if(loadXtalk == false){ 
+    printf("Oops! No X-Talk Correction Matrix found -_- "); 
+  return 1;}
 
   GCorrelator corr;
   std::vector<ddasHit> event;

@@ -190,6 +190,28 @@ void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
   if(!cut->IsInside(tof,dE)) continue;
 
 
+  if(decay.EventType() == 2){ //Decay
+     double DT = (decay.fClover.fTimestamp - decay.fDSSD.fTimestamp);
+  
+    GHistogramer::Get().Fill(Form("%s/gamma_dt",cut->GetName()),1000,-500,500,DT,
+                                        1000,0,4000,decay.fClover.fEcal);                                                   
+  }
+ 
+
+if(decay.EventType() == 2) { // Decay
+  for(const auto& g : decay.fClover.fCloverHits) {
+    const int id = g.GetId() - 224;
+    if(id < 0 || id >= 64) continue;
+
+    const int clover = id / 4;
+    const double DT = g.GetTimestamp() - decay.fDSSD.fTimestamp;
+
+    GHistogramer::Get().Fill(
+      Form("%s/gamma_dt_clover_%02d", cut->GetName(), clover),1000, -500, 500, DT,
+                                                               1000, 0, 4000, g.GetEcal());
+  }
+}
+
 
   GHistogramer::Get().Fill(Form("%s/dt_HalfLife",cut->GetName()), 4000, -1000, 3000, dt);
 

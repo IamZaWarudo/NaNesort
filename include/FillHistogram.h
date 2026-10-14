@@ -20,6 +20,8 @@ void Gamma(const GBCS& bcs);
 void Correlation(const GBCS& implant, const GBCS& decay, double dt);
 void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt);
 void Other(const GBCS& bcs, const std::vector<ddasHit>& hits);
+void DecayTimePlot(const GBCS& implant, const GBCS& decay, double dt);
+
 
 
 #endif

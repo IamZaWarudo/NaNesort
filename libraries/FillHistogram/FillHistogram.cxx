@@ -212,12 +212,13 @@ if(decay.EventType() == 2) { // Decay
   }
 }
 
-
-  GHistogramer::Get().Fill(Form("%s/dt_HalfLife",cut->GetName()), 4000, -1000, 3000, dt);
-
   GHistogramer::Get().Fill(Form("%s/position",cut->GetName()), 40,0,40, decay.fDSSD.Xpos,
                                                                40,0,40, decay.fDSSD.Ypos);
  
+
+// Prompt Gamma Gate
+ double DT2 = (decay.fClover.fTimestamp - decay.fDSSD.fTimestamp);
+ if(DT2 < 40 && DT2 > -40) {
 
    for(const auto& g : decay.fClover.fCloverHits) {
     double energy = g.GetEcal();
@@ -234,10 +235,41 @@ if(decay.EventType() == 2) { // Decay
     if(GammaAddback <= 0) continue;
   GHistogramer::Get().Fill(Form("%s/dt_gamma(AddBack)",cut->GetName()),4000,-1000,3000,dt,
                                                                       5000,0,5000,GammaAddback);
+   }
   }
-
  }
 }
+
+
+void DecayTimePlot(const GBCS& implant, const GBCS& decay, double dt) {
+
+  if(!pids) 
+    LoadPIDs();
+
+  TIter iter(pids);
+  while(TCutG *cut = (TCutG*)iter.Next()) {
+  
+  const double tof = CorrectedTOF(implant);
+  const double dE  = implant.fPin1.fEcal;
+  if(!cut->IsInside(tof,dE)) continue;
+
+
+  GHistogramer::Get().Fill(Form("%s/dtime",cut->GetName()), 2000, -1000, 1000, dt);
+
+ 
+  for(int clover = 0; clover < 16; ++clover){
+    double GA = decay.fClover.fAddback[clover];
+    if (decay.EventType() != 2) return;
+    if(GA <= 0) continue;
+
+  double Range = 50; 
+  if(GA < 885 + Range && GA > 885 - Range) {
+  GHistogramer::Get().Fill(Form("%s/dt_Na32->Mg32",cut->GetName()),2000,-1000,1000,dt);
+   }
+  }
+ }
+}
+
 
 void Other(const GBCS& bcs, const std::vector<ddasHit>& hits){
 

@@ -235,6 +235,9 @@ if(decay.EventType() == 2) { // Decay
     if(GammaAddback <= 0) continue;
   GHistogramer::Get().Fill(Form("%s/dt_gamma(AddBack)",cut->GetName()),4000,-1000,3000,dt,
                                                                       5000,0,5000,GammaAddback);
+   
+  GHistogramer::Get().Fill(Form("%s/gamma_gamma",cut->GetName()),5000,0,5000,GammaAddback,
+                                                                5000,0,5000,GammaAddback);
    }
   }
  }

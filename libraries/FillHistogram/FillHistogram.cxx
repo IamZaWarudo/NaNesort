@@ -179,6 +179,17 @@ void Correlation(const GBCS& implant, const GBCS& decay, double dt){
 
 void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
 
+  
+  for(int clover = 0; clover < 16; ++clover){
+    double GammaAddback = decay.fClover.fAddback[clover];
+    if (decay.EventType() != 2) return;
+    if(GammaAddback <= 0) continue;
+   
+  GHistogramer::Get().Fill("gamma_gamma",5000,0,5000,GammaAddback,
+                                        5000,0,5000,GammaAddback);
+   }
+
+
   if(!pids) 
     LoadPIDs();
 

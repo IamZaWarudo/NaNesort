@@ -112,6 +112,21 @@ if(bcs.EventType() == 2){ //Decay
 
 void Gamma(const GBCS& bcs){
 
+// gamma - gamma 
+ for(int x = 0; x < 16; ++x){
+   const double GammaAB1 = bcs.fClover.fAddback[x];
+   if(GammaAB1 <= 0) continue;
+
+ for(int y = x+1; y < 16; ++y) {
+   const double GammaAB2 = bcs.fClover.fAddback[y];
+   if(GammaAB2 <= 0) continue;
+   if(GammaAB1 == GammaAB2) continue;
+
+   GHistogramer::Get().Fill("Gamma_Gamma",2500,0,5000,GammaAB1,
+                                          2500,0,5000,GammaAB2);
+ }
+}
+
 if(bcs.EventType() == 2) { 
   for(int clover = 0; clover < 16; ++clover){
     double GammaAddback = bcs.fClover.fAddback[clover];
@@ -179,16 +194,6 @@ void Correlation(const GBCS& implant, const GBCS& decay, double dt){
 
 void CorrelationAllPairs(const GBCS& implant, const GBCS& decay, double dt){
 
-  
-  for(int clover = 0; clover < 16; ++clover){
-    double GammaAddback = decay.fClover.fAddback[clover];
-    if (decay.EventType() != 2) return;
-    if(GammaAddback <= 0) continue;
-   
-  GHistogramer::Get().Fill("gamma_gamma",5000,0,5000,GammaAddback,
-                                        5000,0,5000,GammaAddback);
-   }
-
 
   if(!pids) 
     LoadPIDs();
@@ -240,16 +245,22 @@ if(decay.EventType() == 2) { // Decay
    }
   
 
-  for(int clover = 0; clover < 16; ++clover){
-    double GammaAddback = decay.fClover.fAddback[clover];
-    if (decay.EventType() != 2) return;
-    if(GammaAddback <= 0) continue;
-  GHistogramer::Get().Fill(Form("%s/dt_gamma(AddBack)",cut->GetName()),4000,-1000,3000,dt,
-                                                                      5000,0,5000,GammaAddback);
-   
-  GHistogramer::Get().Fill(Form("%s/gamma_gamma",cut->GetName()),5000,0,5000,GammaAddback,
-                                                                5000,0,5000,GammaAddback);
-   }
+// gamma - gamma 
+ for(int x = 0; x < 16; ++x){
+   const double GammaAB1 = decay.fClover.fAddback[x];
+   if(GammaAB1 <= 0) continue;
+
+ for(int y = x+1; y < 16; ++y) {
+   const double GammaAB2 = decay.fClover.fAddback[y];
+   if(GammaAB2 <= 0) continue;
+   if(GammaAB1 == GammaAB2) continue;
+
+   GHistogramer::Get().Fill(Form("%s/Gamma_Gamma", cut->GetName()),2500,0,5000,GammaAB1,
+                                                                    2500,0,5000,GammaAB2);
+ }
+}
+
+  
   }
  }
 }

@@ -241,7 +241,7 @@ if(decay.EventType() == 2) { // Decay
     if(energy <= 0) continue;
   
   GHistogramer::Get().Fill(Form("%s/dt_gamma",cut->GetName()),4000, -1000, 3000,dt,
-                                                              5000,0,5000, energy);
+                                                              4000,0,4000, energy);
    }
   
 for(int i = 0; i < 16; ++i){
@@ -249,7 +249,7 @@ for(int i = 0; i < 16; ++i){
   if(energyAddBack <= 0) continue;
 
  GHistogramer::Get().Fill(Form("%s/dt_gamma(AddBack)",cut->GetName()),4000, -1000, 3000,dt,
-                                                                       5000,0,5000, energyAddBack);
+                                                                       4000,0,4000, energyAddBack);
  
 }
 
@@ -263,8 +263,8 @@ for(int i = 0; i < 16; ++i){
    if(GammaAB2 <= 0) continue;
    if(GammaAB1 == GammaAB2) continue;
 
-   GHistogramer::Get().Fill(Form("%s/Gamma_Gamma", cut->GetName()),2500,0,5000,GammaAB1,
-                                                                    2500,0,5000,GammaAB2);
+   GHistogramer::Get().Fill(Form("%s/Gamma_Gamma", cut->GetName()),2000,0,4000,GammaAB1,
+                                                                    2000,0,4000,GammaAB2);
  }
 }
 
@@ -289,7 +289,7 @@ void DecayTimePlot(const GBCS& implant, const GBCS& decay, double dt) {
 
   GHistogramer::Get().Fill(Form("%s/dtime",cut->GetName()), 2000, -1000, 1000, dt);
 
- 
+/* 
   for(int clover = 0; clover < 16; ++clover){
     double GA = decay.fClover.fAddback[clover];
     if (decay.EventType() != 2) return;
@@ -299,7 +299,7 @@ void DecayTimePlot(const GBCS& implant, const GBCS& decay, double dt) {
   if(GA < 885 + Range && GA > 885 - Range) {
   GHistogramer::Get().Fill(Form("%s/dt_Na32->Mg32",cut->GetName()),2000,-1000,1000,dt);
    }
-  }
+  } */
  }
 }
 

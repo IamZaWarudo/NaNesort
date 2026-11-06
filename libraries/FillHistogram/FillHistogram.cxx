@@ -234,7 +234,7 @@ if(decay.EventType() == 2) { // Decay
 
 // Prompt Gamma Gate
  double DT2 = (decay.fClover.fTimestamp - decay.fDSSD.fTimestamp);
- if(DT2 < 40 && DT2 > -40) {
+ if(DT2 < 50 && DT2 > -30) {
 
    for(const auto& g : decay.fClover.fCloverHits) {
     double energy = g.GetEcal();
@@ -244,6 +244,14 @@ if(decay.EventType() == 2) { // Decay
                                                               5000,0,5000, energy);
    }
   
+for(int i = 0; i < 16; ++i){
+  double energyAddBack = decay.fClover.fAddback[i];
+  if(energyAddBack <= 0) continue;
+
+ GHistogramer::Get().Fill(Form("%s/dt_gamma(AddBack)",cut->GetName()),4000, -1000, 3000,dt,
+                                                                       5000,0,5000, energyAddBack);
+ 
+}
 
 // gamma - gamma 
  for(int x = 0; x < 16; ++x){

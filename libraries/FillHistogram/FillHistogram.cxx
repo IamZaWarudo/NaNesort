@@ -112,30 +112,37 @@ if(bcs.EventType() == 2){ //Decay
 
 void Gamma(const GBCS& bcs){
 
+
+// Prompt Gamma Gate
+ double DT2 = (bcs.fClover.fTimestamp - bcs.fDSSD.fTimestamp);
+ if(DT2 < 50 && DT2 > -30) {
+ if(bcs.EventType() == 2) {
+
 // gamma - gamma 
- for(int x = 0; x < 16; ++x){
-   const double GammaAB1 = bcs.fClover.fAddback[x];
+ for(int a = 0; a < 16; ++a){
+   const double GammaAB1 = bcs.fClover.fAddback[a];
    if(GammaAB1 <= 0) continue;
 
- for(int y = x+1; y < 16; ++y) {
-   const double GammaAB2 = bcs.fClover.fAddback[y];
+ for(int b = a+1; b < 16; ++b) {
+   const double GammaAB2 = bcs.fClover.fAddback[b];
    if(GammaAB2 <= 0) continue;
    if(GammaAB1 == GammaAB2) continue;
 
-   GHistogramer::Get().Fill("Gamma_Gamma",2500,0,5000,GammaAB1,
-                                          2500,0,5000,GammaAB2);
+   GHistogramer::Get().Fill("Gamma_Gamma",2000,0,4000,GammaAB1,
+                                          2000,0,4000,GammaAB2);
+  }
  }
-}
 
-if(bcs.EventType() == 2) { 
   for(int clover = 0; clover < 16; ++clover){
     double GammaAddback = bcs.fClover.fAddback[clover];
     if(GammaAddback <= 0) continue;
   GHistogramer::Get().Fill("Decay_gamma(AddBack)",5000,0,5000,GammaAddback);
    }
-  } 
-
+  
+  }
+ } 
 }
+
 
 
 void LoadPIDs() { //TODO make me find the file better

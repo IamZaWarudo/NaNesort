@@ -10,7 +10,7 @@ void Background1D(int iterations = 20)
     auto* hist = dynamic_cast<TH1D*>(GrabHist());
 
     if (!hist) {
-        std::cerr << "Select a TH1D or GH1D spectrum first.\n";
+        std::cerr << "Select a TH1D or GH1D spectrum first Bro...\n";
         return;
     }
 

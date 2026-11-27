@@ -1,0 +1,70 @@
+{
+  "_comment": "Reproduces the last 44S run from the web tool. Every time you type is in timeUnit; internally everything is seconds.",
+
+  "timeUnit": "ms",
+
+  "chain": [
+    {
+      "label": "44S",
+      "t12": 118.2,
+      "t12Sigma": 1.6,
+      "fixed": "prior",
+      "eff": 1.0,
+      "effFixed": "fixed",
+      "parent": 0,
+      "br": 100,
+      "brSigma": 0
+    },
+    {
+      "label": "44Cl",
+      "t12": 700,
+      "t12Sigma": 70,
+      "fixed": "fixed",
+      "eff": 1.0,
+      "effFixed": "free",
+      "parent": 1,
+      "br": 80,
+      "brSigma": 0
+    },
+    {
+      "label": "43Cl",
+      "t12": 3130,
+      "t12Sigma": 90,
+      "fixed": "fixed",
+      "eff": 1.0,
+      "effFixed": "fixed",
+      "parent": 1,
+      "br": 20,
+      "brSigma": 5
+    }
+  ],
+
+  "useDemoData": false,
+
+  "tMin": 2,
+  "tMax": 5000,
+  "cropToWindow": false,
+  "nBins": 64,
+  "binMode": "linear",
+  "edgeRef": "center",
+  "rebin": 1,
+
+  "fitBackground": true,
+  "autoStart": true,
+  "bkgRate": 8.0,
+  "bkgMode": "decaying",
+  "bkgT12": null,
+  "bkgT12Fixed": "free",
+  "bkgTailFit": true,
+  "bkgTailMin": 3500,
+  "bkgTailMax": 5000,
+
+  "capEff": false,
+  "tieSiblings": true,
+  "tagOutputs": true,
+
+  "scanParent": true,
+  "scanMin": 100,
+  "scanMax": 130,
+  "scanPoints": 16
+}

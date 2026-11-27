@@ -46,10 +46,10 @@ for(const auto &hit : hits) {
 //     fI2SPin2.Unpack(hit);    // Pin2 lwk dead 
         break;
       case 180:
-       TACValue = hit.GetEcal();
-       if(TACValue < 19000 && TACValue > 5000){      
+       //TACValue = hit.GetEcal();
+       //if(TACValue < 19000 && TACValue > 5000){      
          bcs.fI2TAC.Unpack(hit);
-        }
+        //}
         break;
       case 181:
 

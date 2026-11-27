@@ -1,0 +1,19 @@
+# Bateman half-life fitter - local install
+#
+#   python -m venv .venv
+#   source .venv/bin/activate         (Windows: .venv\Scripts\activate)
+#   pip install -r requirements.txt
+#
+# Nothing here talks to a network at run time.
+
+# the fit engine
+numpy>=1.24
+scipy>=1.10
+pandas>=2.0
+
+# the graphical interface (streamlit run app.py)
+streamlit>=1.30
+plotly>=5.18
+
+# only needed for run_fit.py --plot
+matplotlib>=3.7

@@ -98,7 +98,10 @@ if(bcs.EventType() == 2){ //Decay
 
   GHistogramer::Get().Fill("PID/PID_Total", 3600,0,24000, tof,
                                             1800,0,12000, dE);
- 
+
+  GHistogramer::Get().Fill("PID/Pin1_vs_Pin2",2000,0,14000, bcs.fPin1.fEcal,
+                                              2000,0,14000, bcs.fPin2.fEcal);
+
   if(bcs.EventType() == 1) {   // IMPLANT
   GHistogramer::Get().Fill("PID/PID_Implant", 3600,0,24000, tof,
                                                 1800,0,12000, dE);
